@@ -25,7 +25,31 @@
             </div>
         </div>
     </div>
+    <script>
+        // Check if dependencies are loaded after a short delay
+        setTimeout(function() {
+            if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || typeof Babel === 'undefined') {
+                document.getElementById('root').innerHTML = 
+                    '<div style="padding: 40px; color: #ef4444; text-align: center; font-family: sans-serif;">' +
+                    '<h2 style="margin-bottom: 20px;">⚠️ ライブラリの読み込みに失敗しました</h2>' +
+                    '<p style="margin-bottom: 10px;">以下のいずれかが原因の可能性があります：</p>' +
+                    '<ul style="list-style: none; padding: 0;">' +
+                    '<li style="margin: 5px 0;">• 広告ブロッカーやプライバシー拡張機能</li>' +
+                    '<li style="margin: 5px 0;">• ネットワークの制限</li>' +
+                    '<li style="margin: 5px 0;">• ファイアウォール設定</li>' +
+                    '</ul>' +
+                    '<p style="margin-top: 20px; font-size: 14px;">広告ブロッカーを無効にするか、別のブラウザでお試しください。</p>' +
+                    '</div>';
+            }
+        }, 3000); // Wait 3 seconds for libraries to load
+    </script>
     <script type="text/babel">
+// Check if all dependencies are loaded
+if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || typeof lucideReact === 'undefined') {
+  document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red; text-align: center;"><p>必要なライブラリが読み込めませんでした。</p><p>広告ブロッカーやプライバシー拡張機能を無効にしてみてください。</p></div>';
+  throw new Error('Required libraries not loaded');
+}
+
 const { useState, useEffect } = React;
 const { Book, User, ArrowRight, GitMerge, Brain, Eye, Zap, Layers, Activity, MessageCircle, Box, LayoutGrid } = lucideReact;
 
@@ -907,8 +931,20 @@ const PhilosophyBook = () => {
 };
 
 // Render the app
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<PhilosophyBook />);
+try {
+  const rootElement = document.getElementById('root');
+  if (ReactDOM.createRoot) {
+    // React 18
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<PhilosophyBook />);
+  } else {
+    // React 17 fallback
+    ReactDOM.render(<PhilosophyBook />, rootElement);
+  }
+} catch (error) {
+  console.error('Error rendering app:', error);
+  document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">エラーが発生しました: ' + error.message + '</div>';
+}
     </script>
 </body>
 </html>
