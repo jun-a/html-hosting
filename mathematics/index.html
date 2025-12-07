@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学図鑑 - Mathematics Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide React icons
+        const Triangle = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            </svg>
+        );
+        
+        const GitGraph = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="18" r="3"></circle>
+                <circle cx="6" cy="6" r="3"></circle>
+                <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
+                <line x1="6" y1="9" x2="6" y2="21"></line>
+            </svg>
+        );
+        
+        const Infinity = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"></path>
+            </svg>
+        );
+        
+        const LayoutGrid = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'ancient', title: '古代：幾何と数', period: 'BC 3000 - AD 500', icon: <Triangle size={18} /> },
+            { id: 'early_mod', title: '近世：微積分と解析', period: '1600 - 1800', icon: <GitGraph size={18} /> },
+            { id: 'modern', title: '近代：無限と論理', period: '1800 - 1950', icon: <Infinity size={18} /> },
+            { id: 'chaos', title: '現代：複雑系と難問', period: '1950 - Present', icon: <LayoutGrid size={18} /> },
+        ];
+        
+        const MATHEMATICIANS = {
+            ancient: [
+                {
+                    id: 'euclid',
+                    name: 'ユークリッド',
+                    title: '幾何学の父',
+                    question: '幾何学の基礎は何か？',
+                    answer: '5つの公理から論理的に証明を積み上げる体系だ。',
+                    detail: '『原論』（紀元前300年頃）で平面幾何学を公理的体系として完成。2000年以上にわたり数学教育の標準となった。非ユークリッド幾何学の発見まで、絶対的な真理と考えられていた。',
+                    connection: '公理的方法の確立。数学の厳密性の原点。',
+                    diagramType: 'pythagorean',
+                    diagramContent: null
+                },
+                {
+                    id: 'pythagoras',
+                    name: 'ピタゴラス',
+                    title: '数の神秘家',
+                    question: '世界の本質は何か？',
+                    answer: '数だ。万物は数の調和で成り立つ。',
+                    detail: 'ピタゴラスの定理で有名。数を神聖視し、宇宙の秩序は数学的比率で表現できると信じた。無理数（√2）の発見は、彼らの世界観を揺るがした。音楽の和音も数比で説明。',
+                    connection: 'プラトンに影響。数学と哲学の融合。',
+                    diagramType: 'pythagorean',
+                    diagramContent: null
+                }
+            ],
+            early_mod: [
+                {
+                    id: 'newton_leibniz',
+                    name: 'ニュートン & ライプニッツ',
+                    title: '微積分の創始者',
+                    question: '変化をどう数学的に捉えるか？',
+                    answer: '微分と積分だ。瞬間の変化率と累積を計算できる。',
+                    detail: 'ニュートンは物理学のために「流率法」を、ライプニッツは独立に微積分を発明（1670年代）。優先権争いが起きたが、両者とも独立の発見。現代の記号はライプニッツに由来。',
+                    connection: '解析学の基礎。科学革命を数学的に支えた。',
+                    diagramType: 'calculus',
+                    diagramContent: null
+                },
+                {
+                    id: 'euler',
+                    name: 'レオンハルト・オイラー',
+                    title: '史上最も多作の数学者',
+                    question: '美しい数式とは何か？',
+                    answer: 'e^(iπ) + 1 = 0だ。5つの重要な定数が一つに。',
+                    detail: '生涯で800以上の論文を執筆。解析学、数論、グラフ理論、トポロジーなど広範な分野に貢献。オイラーの公式、オイラー定数、多面体定理など、無数の定理・記号に名を残す。失明後も研究を続けた。',
+                    connection: '現代数学の多くの分野の基礎を築いた。',
+                    diagramType: 'euler_identity',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'cantor',
+                    name: 'ゲオルク・カントール',
+                    title: '無限の理論家',
+                    question: '無限に大小はあるか？',
+                    answer: 'ある。自然数の無限より実数の無限の方が「大きい」。',
+                    detail: '集合論を創始し、無限の濃度（基数）の理論を確立（1870-80年代）。連続体仮説を提唱したが証明できず、精神を病んだ。当初は異端視されたが、今や数学の基礎。',
+                    connection: '現代数学の基礎。ゲーデルに影響。',
+                    diagramType: 'infinity_levels',
+                    diagramContent: null
+                },
+                {
+                    id: 'godel',
+                    name: 'クルト・ゲーデル',
+                    title: '不完全性定理の証明者',
+                    question: '数学はすべて証明できるか？',
+                    answer: 'いいえ。十分に強い体系には必ず証明不可能な真の命題がある。',
+                    detail: '不完全性定理（1931）で、算術を含む形式体系は自己の無矛盾性を証明できず、真だが証明不可能な命題が存在することを示した。ヒルベルトの夢を打ち砕き、数学の限界を明らかにした。',
+                    connection: '数理論理学の金字塔。計算理論に影響。',
+                    diagramType: 'incompleteness',
+                    diagramContent: null
+                }
+            ],
+            chaos: [
+                {
+                    id: 'mandelbrot',
+                    name: 'ブノワ・マンデルブロ',
+                    title: 'フラクタル幾何学の父',
+                    question: '複雑な自然の形をどう数学的に捉えるか？',
+                    answer: 'フラクタルだ。自己相似的な無限の複雑さ。',
+                    detail: 'フラクタル幾何学を創始（1975）。海岸線、雲、木の枝など、ユークリッド幾何学では記述できない自然の形を数学的に表現。マンデルブロ集合は数学と芸術の融合の象徴。',
+                    connection: 'カオス理論、計算機グラフィックスに影響。',
+                    diagramType: 'fractal',
+                    diagramContent: null
+                },
+                {
+                    id: 'perelman',
+                    name: 'グリゴリー・ペレルマン',
+                    title: 'ポアンカレ予想の解決者',
+                    question: 'すべての単連結な3次元閉多様体は3次元球面か？',
+                    answer: 'はい。リッチフローで証明できる。',
+                    detail: '100年以上未解決だったポアンカレ予想を解決（2003）。フィールズ賞とミレニアム懸賞問題の賞金100万ドルを辞退し、数学界から姿を消した。トポロジーと微分幾何学を融合した画期的な証明。',
+                    connection: '幾何化予想の証明。現代トポロジーの頂点。',
+                    diagramType: 'topology',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type, content }) => {
+            if (type === 'pythagorean') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative">
+                            <svg width="120" height="120" viewBox="0 0 120 120">
+                                <polygon points="10,110 110,110 60,10" stroke="#3b82f6" strokeWidth="2" fill="none" />
+                                <line x1="60" y1="110" x2="60" y2="10" stroke="#fbbf24" strokeWidth="1" strokeDasharray="3,3" />
+                                <text x="60" y="105" fill="#ffffff" fontSize="12" textAnchor="middle">a²+b²=c²</text>
+                            </svg>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'calculus') {
+                return (
+                    <div className="flex flex-col items-center gap-3 p-4">
+                        <div className="text-xl font-bold text-blue-400">∫ f(x)dx</div>
+                        <div className="text-xl font-bold text-green-400">d/dx f(x)</div>
+                        <div className="text-xs text-gray-400">積分と微分</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'euler_identity') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-purple-400 mb-2">e^(iπ) + 1 = 0</div>
+                        <div className="text-xs text-gray-400">最も美しい数式</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'infinity_levels') {
+                return (
+                    <div className="flex flex-col items-center gap-2 p-4">
+                        <div className="text-lg text-blue-400">ℵ₀ (可算無限)</div>
+                        <div className="text-2xl">↓</div>
+                        <div className="text-lg text-red-400">ℵ₁ (連続体)</div>
+                        <div className="text-xs text-gray-400 mt-2">無限の階層</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'incompleteness') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🚫</div>
+                        <div className="text-sm text-red-400 text-center">この命題は証明できない</div>
+                        <div className="text-xs text-gray-400 mt-2">(が、真である)</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'fractal') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🌿</div>
+                        <div className="text-lg font-bold text-green-400">フラクタル</div>
+                        <div className="text-xs text-gray-400 mt-2">自己相似的な無限の複雑さ</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'topology') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="flex gap-4 items-center">
+                            <div className="w-16 h-16 rounded-full border-4 border-blue-500"></div>
+                            <div className="text-2xl">=</div>
+                            <div className="w-16 h-16 border-4 border-blue-500"></div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">トポロジー的に同じ</div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const MathematicsApp = () => {
+            const [selectedEra, setSelectedEra] = useState('ancient');
+            const [selectedMathematician, setSelectedMathematician] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const mathematicians = MATHEMATICIANS[selectedEra] || [];
+                setSelectedMathematician(mathematicians[0] || null);
+            }, [selectedEra]);
+            
+            const mathematicians = MATHEMATICIANS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handleMathematicianSelect = (mathematician) => {
+                setSelectedMathematician(mathematician);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
+                                    数学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Mathematics Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
+                                数学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Mathematics Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-blue-900 border border-blue-600 shadow-lg shadow-blue-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">数学者一覧</h2>
+                            {mathematicians.map((m) => (
+                                <div
+                                    key={m.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedMathematician?.id === m.id
+                                            ? 'bg-blue-900/50 border border-blue-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedMathematician(m)}
+                                >
+                                    <div className="font-semibold text-sm">{m.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{m.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedMathematician && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-blue-400 mb-3">{selectedMathematician.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedMathematician.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedMathematician.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedMathematician.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedMathematician.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedMathematician.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedMathematician.diagramType} content={selectedMathematician.diagramContent} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">数学者一覧</h2>
+                                {mathematicians.map((m) => (
+                                    <div
+                                        key={m.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedMathematician?.id === m.id
+                                                ? 'bg-blue-900/50 border border-blue-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handleMathematicianSelect(m)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{m.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{m.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedMathematician && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-blue-400 mb-2">{selectedMathematician.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedMathematician.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedMathematician.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedMathematician.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedMathematician.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedMathematician.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedMathematician.diagramType} content={selectedMathematician.diagramContent} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MathematicsApp />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地政学図鑑 - Geopolitics Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide React icons (inline SVG components)
+        const Anchor = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="5" r="3"></circle>
+                <line x1="12" y1="22" x2="12" y2="8"></line>
+                <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
+            </svg>
+        );
+        
+        const Shield = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+        );
+        
+        const Globe = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+        );
+        
+        const Target = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        // ----------------------------------------------------------------------------
+        // DATA STRUCTURE
+        // ----------------------------------------------------------------------------
+        
+        const ERAS = [
+            { id: 'classical', title: '古典地政学：陸と海', period: '1890 - 1945', icon: <Anchor size={18} /> },
+            { id: 'coldwar', title: '冷戦期：封じ込め', period: '1945 - 1990', icon: <Shield size={18} /> },
+            { id: 'postcold', title: 'ポスト冷戦：文明', period: '1990 - 2001', icon: <Globe size={18} /> },
+            { id: 'modern', title: '現代：宇宙とサイバー', period: '2001 - Present', icon: <Target size={18} /> },
+        ];
+        
+        const THEORISTS = {
+            classical: [
+                {
+                    id: 'mahan',
+                    name: 'アルフレッド・マハン',
+                    title: '海洋力の理論家',
+                    question: '国家の力の源泉は何か？',
+                    answer: '制海権だ。海を制する者が世界を制する。',
+                    detail: '米海軍将校で歴史家。『海上権力史論』(1890)で、海洋支配が国力の鍵であると説いた。海軍力、商船隊、海外基地の重要性を強調し、米国の帝国主義的拡大を正当化した。',
+                    connection: '英国の海洋覇権を分析。米国の太平洋進出を理論的に支えた。',
+                    diagramType: 'sea_power',
+                    diagramContent: null
+                },
+                {
+                    id: 'mackinder',
+                    name: 'ハルフォード・マッキンダー',
+                    title: 'ハートランド理論',
+                    question: '世界の支配の中心はどこか？',
+                    answer: 'ユーラシア大陸の中心部「ハートランド」だ。',
+                    detail: '英国の地理学者。1904年の「歴史の地理的軸心」で、ユーラシア中央部（ロシア）を支配する者が世界を支配すると主張。「東欧を制する者がハートランドを制し、ハートランドを制する者が世界島を制し、世界島を制する者が世界を制する」',
+                    connection: '冷戦期の封じ込め政策の理論的基礎。',
+                    diagramType: 'heartland',
+                    diagramContent: null
+                },
+                {
+                    id: 'spykman',
+                    name: 'ニコラス・スパイクマン',
+                    title: 'リムランド理論',
+                    question: 'ハートランドよりも重要な地域は？',
+                    answer: 'リムランド（周縁部）だ。ここを制する者が世界を制する。',
+                    detail: 'オランダ系米国人の政治学者。マッキンダーを修正し、ユーラシア大陸の沿岸部（西欧、中東、南アジア、東アジア）の重要性を強調。「リムランドを制する者が世界を制する」',
+                    connection: '米国の対ソ封じ込め戦略の理論的基礎。',
+                    diagramType: 'rimland',
+                    diagramContent: null
+                }
+            ],
+            coldwar: [
+                {
+                    id: 'kennan',
+                    name: 'ジョージ・ケナン',
+                    title: '封じ込め政策の父',
+                    question: 'ソ連の拡張主義にどう対処すべきか？',
+                    answer: '封じ込め（Containment）だ。拡大を許さず、圧力をかけ続ける。',
+                    detail: '米国の外交官。1946年の「長文電報」と1947年の「X論文」で、ソ連の膨張主義的性質を分析し、軍事的・政治的封じ込めを提唱。トルーマン・ドクトリンやマーシャル・プランの理論的基盤となった。',
+                    connection: '冷戦政策の設計者。後にベトナム戦争を批判。',
+                    diagramType: 'containment',
+                    diagramContent: null
+                },
+                {
+                    id: 'domino',
+                    name: 'ドミノ理論',
+                    title: '連鎖的崩壊の恐怖',
+                    question: '一国が共産化するとどうなるか？',
+                    answer: '周辺国が次々と倒れるドミノ倒しが起きる。',
+                    detail: 'アイゼンハワー大統領が1954年に提唱。東南アジアの一国が共産化すれば、隣国も次々と共産化するという理論。ベトナム戦争への介入を正当化したが、実際には起きなかった。',
+                    connection: '封じ込め政策の極端な解釈。ベトナム戦争の泥沼化の原因。',
+                    diagramType: 'domino',
+                    diagramContent: null
+                }
+            ],
+            postcold: [
+                {
+                    id: 'fukuyama',
+                    name: 'フランシス・フクヤマ',
+                    title: '歴史の終わり',
+                    question: '冷戦後の世界はどうなるか？',
+                    answer: '自由民主主義の勝利で「歴史は終わった」。',
+                    detail: '日系米国人の政治学者。1989年の論文で、冷戦終結をもって自由民主主義と市場経済が最終的な政治形態となり、イデオロギー対立が終焉したと主張。ヘーゲルの歴史哲学に基づく楽観論だったが、9.11や中国の台頭で批判された。',
+                    connection: 'ネオコン思想の影響。後に修正を迫られた。',
+                    diagramType: 'end_of_history',
+                    diagramContent: null
+                },
+                {
+                    id: 'huntington',
+                    name: 'サミュエル・ハンチントン',
+                    title: '文明の衝突',
+                    question: '冷戦後の対立軸は何か？',
+                    answer: 'イデオロギーではなく「文明」だ。',
+                    detail: '米国の政治学者。1993年の論文で、冷戦後の世界は西洋、イスラム、中華、日本など8つの文明圏の対立が主軸になると予測。9.11後に注目されたが、文明の境界は曖昧で、過度に単純化しているとも批判された。',
+                    connection: 'フクヤマへの反論。米国の対テロ戦争を正当化。',
+                    diagramType: 'clash_civilizations',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'brzezinski',
+                    name: 'ズビグニュー・ブレジンスキー',
+                    title: 'グランドチェスボード',
+                    question: '米国はどうユーラシアを管理すべきか？',
+                    answer: 'チェス盤のように戦略的に駒を配置し、覇権国の出現を防ぐ。',
+                    detail: 'ポーランド系米国人の戦略家。カーター政権の国家安全保障担当補佐官。ユーラシアを「グランドチェスボード」と呼び、米国が覇権を維持するには中東・中央アジア・東アジアの要衝を押さえる必要があると主張。',
+                    connection: 'マッキンダー理論の現代版。中国封じ込めの理論的基盤。',
+                    diagramType: 'grand_chessboard',
+                    diagramContent: null
+                },
+                {
+                    id: 'cyber',
+                    name: 'サイバー地政学',
+                    title: '第5の領域',
+                    question: '陸海空宇宙に次ぐ戦場は？',
+                    answer: 'サイバー空間だ。国境のない新たな戦場。',
+                    detail: '21世紀の地政学の新領域。サイバー攻撃、情報戦、デジタル主権が国家間競争の焦点に。中国のグレートファイアウォール、ロシアのハイブリッド戦争、米国のサイバー軍など、デジタル覇権争いが激化。',
+                    connection: 'AI・量子技術との融合。宇宙地政学とも連動。',
+                    diagramType: 'cyber_domain',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ----------------------------------------------------------------------------
+        // DIAGRAM BUILDER
+        // ----------------------------------------------------------------------------
+        
+        const DiagramBuilder = ({ type, content }) => {
+            if (type === 'sea_power') {
+                return (
+                    <div className="flex flex-col items-center p-4 gap-3">
+                        <div className="text-4xl">⚓</div>
+                        <div className="text-lg font-bold text-blue-400">制海権</div>
+                        <div className="flex gap-2 mt-2">
+                            <div className="bg-blue-900 p-2 rounded text-xs">海軍力</div>
+                            <div className="bg-blue-900 p-2 rounded text-xs">商船隊</div>
+                            <div className="bg-blue-900 p-2 rounded text-xs">海外基地</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'heartland') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-48 h-32 border-2 border-gray-500 rounded-lg flex items-center justify-center">
+                            <div className="absolute inset-4 bg-red-900 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold">ハートランド</span>
+                            </div>
+                            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-xs text-gray-400">ユーラシア大陸</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3 text-center">東欧→ハートランド→世界島→世界</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'rimland') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-48 h-32">
+                            <div className="absolute inset-0 border-2 border-gray-500 rounded-lg"></div>
+                            <div className="absolute inset-8 bg-gray-700 rounded"></div>
+                            <div className="absolute inset-2 flex items-center justify-center">
+                                <div className="absolute inset-0 border-4 border-yellow-600 rounded-lg"></div>
+                                <span className="text-xs font-bold text-yellow-500 z-10">リムランド</span>
+                            </div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">西欧・中東・南アジア・東アジア</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'containment') {
+                return (
+                    <div className="flex items-center justify-center gap-4 p-4">
+                        <div className="bg-red-900 p-4 rounded text-sm">ソ連</div>
+                        <div className="flex flex-col gap-1">
+                            <div className="w-12 h-1 bg-blue-600"></div>
+                            <div className="w-12 h-1 bg-blue-600"></div>
+                            <div className="w-12 h-1 bg-blue-600"></div>
+                        </div>
+                        <div className="text-xs text-gray-400">封じ込め</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'domino') {
+                return (
+                    <div className="flex items-end justify-center gap-2 p-4">
+                        <div className="w-8 h-16 bg-gray-700 rounded transform rotate-12"></div>
+                        <div className="w-8 h-16 bg-gray-700 rounded transform rotate-6"></div>
+                        <div className="w-8 h-16 bg-gray-700 rounded"></div>
+                        <div className="w-8 h-16 bg-gray-700 rounded"></div>
+                        <div className="w-8 h-16 bg-gray-700 rounded"></div>
+                    </div>
+                );
+            }
+            
+            if (type === 'end_of_history') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🏁</div>
+                        <div className="text-lg font-bold text-green-500">歴史の終わり</div>
+                        <div className="text-xs text-gray-400 mt-2">自由民主主義の最終的勝利</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'clash_civilizations') {
+                return (
+                    <div className="grid grid-cols-2 gap-2 p-4">
+                        <div className="bg-blue-900 p-2 rounded text-xs text-center">西洋</div>
+                        <div className="bg-green-900 p-2 rounded text-xs text-center">イスラム</div>
+                        <div className="bg-red-900 p-2 rounded text-xs text-center">中華</div>
+                        <div className="bg-purple-900 p-2 rounded text-xs text-center">日本</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'grand_chessboard') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="grid grid-cols-4 gap-1">
+                            {[...Array(16)].map((_, i) => (
+                                <div key={i} className={`w-8 h-8 ${i % 2 === Math.floor(i/4) % 2 ? 'bg-gray-700' : 'bg-gray-900'}`}></div>
+                            ))}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">ユーラシア＝チェス盤</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'cyber_domain') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🌐</div>
+                        <div className="text-lg font-bold text-cyan-400">サイバー空間</div>
+                        <div className="flex gap-2 mt-2 flex-wrap justify-center">
+                            <div className="bg-gray-800 p-1 rounded text-xs">陸</div>
+                            <div className="bg-blue-900 p-1 rounded text-xs">海</div>
+                            <div className="bg-sky-900 p-1 rounded text-xs">空</div>
+                            <div className="bg-purple-900 p-1 rounded text-xs">宇宙</div>
+                            <div className="bg-cyan-900 p-1 rounded text-xs font-bold">サイバー</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        // ----------------------------------------------------------------------------
+        // MAIN APP
+        // ----------------------------------------------------------------------------
+        
+        const GeopoliticsApp = () => {
+            const [selectedEra, setSelectedEra] = useState('classical');
+            const [selectedTheorist, setSelectedTheorist] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const theorists = THEORISTS[selectedEra] || [];
+                setSelectedTheorist(theorists[0] || null);
+            }, [selectedEra]);
+            
+            const theorists = THEORISTS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handleTheoristSelect = (theorist) => {
+                setSelectedTheorist(theorist);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    {/* Header */}
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                                    地政学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Geopolitics Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                                地政学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Geopolitics Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-red-900 border border-red-600 shadow-lg shadow-red-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">理論家一覧</h2>
+                            {theorists.map((t) => (
+                                <div
+                                    key={t.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedTheorist?.id === t.id
+                                            ? 'bg-red-900/50 border border-red-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedTheorist(t)}
+                                >
+                                    <div className="font-semibold text-sm">{t.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{t.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedTheorist && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-red-400 mb-3">{selectedTheorist.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedTheorist.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedTheorist.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedTheorist.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedTheorist.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedTheorist.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedTheorist.diagramType} content={selectedTheorist.diagramContent} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">理論家一覧</h2>
+                                {theorists.map((t) => (
+                                    <div
+                                        key={t.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedTheorist?.id === t.id
+                                                ? 'bg-red-900/50 border border-red-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handleTheoristSelect(t)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{t.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{t.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedTheorist && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-red-400 mb-2">{selectedTheorist.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedTheorist.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedTheorist.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedTheorist.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedTheorist.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedTheorist.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedTheorist.diagramType} content={selectedTheorist.diagramContent} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<GeopoliticsApp />);
+    </script>
+</body>
+</html>
