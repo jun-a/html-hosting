@@ -413,11 +413,13 @@
             
             if (type === 'system_lifeworld') {
                 return (
-                    <div className="flex justify-around items-center p-4">
-                        <div className="bg-red-900 p-4 rounded text-sm text-center">{content.system}</div>
-                        <div className="text-yellow-500 text-2xl">→</div>
-                        <div className="bg-green-900 p-4 rounded text-sm text-center">{content.lifeworld}</div>
-                        <div className="text-xs text-gray-400 absolute bottom-2">{content.action}</div>
+                    <div className="flex flex-col items-center p-4 gap-3">
+                        <div className="flex justify-around items-center w-full">
+                            <div className="bg-red-900 p-4 rounded text-sm text-center">{content.system}</div>
+                            <div className="text-yellow-500 text-2xl">→</div>
+                            <div className="bg-green-900 p-4 rounded text-sm text-center">{content.lifeworld}</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">{content.action}</div>
                     </div>
                 );
             }
