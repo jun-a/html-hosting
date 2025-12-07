@@ -512,12 +512,8 @@
         const SociologyApp = () => {
             const [selectedEra, setSelectedEra] = useState('founders');
             const [selectedSociologist, setSelectedSociologist] = useState(null);
-<<<<<<< HEAD
-            const [mobileView, setMobileView] = useState('eras'); // 'eras', 'sociologists', 'content'
-=======
             // Mobile view state: 'era' | 'list' | 'content'
             const [mobileView, setMobileView] = useState('era');
->>>>>>> origin/main
             
             useEffect(() => {
                 const sociologists = SOCIOLOGISTS[selectedEra] || [];
@@ -526,13 +522,6 @@
             
             const sociologists = SOCIOLOGISTS[selectedEra] || [];
             
-<<<<<<< HEAD
-            const handleEraSelect = (eraId) => {
-                setSelectedEra(eraId);
-                setMobileView('sociologists');
-            };
-            
-=======
             // Handle era selection on mobile
             const handleEraSelect = (eraId) => {
                 setSelectedEra(eraId);
@@ -540,22 +529,11 @@
             };
             
             // Handle sociologist selection on mobile
->>>>>>> origin/main
             const handleSociologistSelect = (sociologist) => {
                 setSelectedSociologist(sociologist);
                 setMobileView('content');
             };
             
-<<<<<<< HEAD
-            return (
-                <div className="min-h-screen bg-black text-white">
-                    {/* Header */}
-                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6 text-center">
-                        <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                            社会学図鑑
-                        </h1>
-                        <p className="text-gray-400 text-sm mt-2">Sociology Illustrated Book</p>
-=======
             // Back button handler
             const handleBack = () => {
                 if (mobileView === 'content') {
@@ -587,7 +565,6 @@
                             </h1>
                             <p className="text-gray-400 text-xs md:text-sm mt-2">Sociology Illustrated Book</p>
                         </div>
->>>>>>> origin/main
                     </header>
                     
                     {/* Desktop Layout (md and up) */}
@@ -602,11 +579,7 @@
                                             ? 'bg-blue-900 border border-blue-600 shadow-lg shadow-blue-500/30'
                                             : 'bg-gray-800 hover:bg-gray-700'
                                     }`}
-                                    onClick={() => {
-                                        setSelectedEra(era.id);
-                                        const newSociologists = SOCIOLOGISTS[era.id] || [];
-                                        setSelectedSociologist(newSociologists[0] || null);
-                                    }}
+                                    onClick={() => setSelectedEra(era.id)}
                                 >
                                     <div className="mt-1">{era.icon}</div>
                                     <div className="flex-1">
@@ -690,43 +663,22 @@
                         </div>
                     </div>
                     
-<<<<<<< HEAD
-                    {/* Mobile Layout (below md) */}
-                    <div className="md:hidden h-[calc(100vh-100px)]">
-                        {/* Era Selection View */}
-                        {mobileView === 'eras' && (
-                            <div className="h-full overflow-y-auto p-4">
-                                <h2 className="text-xl font-bold text-gray-200 mb-4">時代を選択</h2>
-=======
                     {/* Mobile Layout */}
                     <div className="md:hidden">
                         {/* Era Selection View */}
                         {mobileView === 'era' && (
                             <div className="min-h-[calc(100vh-140px)] bg-gray-900 p-4">
                                 <h2 className="text-lg font-semibold text-gray-300 mb-4">時代を選択</h2>
->>>>>>> origin/main
                                 {ERAS.map((era) => (
                                     <div
                                         key={era.id}
                                         className={`flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all ${
                                             selectedEra === era.id
-<<<<<<< HEAD
-                                                ? 'bg-blue-900 border border-blue-600 shadow-lg'
-=======
                                                 ? 'bg-blue-900 border border-blue-600 shadow-lg shadow-blue-500/30'
->>>>>>> origin/main
                                                 : 'bg-gray-800 active:bg-gray-700'
                                         }`}
                                         onClick={() => handleEraSelect(era.id)}
                                     >
-<<<<<<< HEAD
-                                        <div className="text-2xl mt-1">{era.icon}</div>
-                                        <div className="flex-1">
-                                            <div className="font-semibold">{era.title}</div>
-                                            <div className="text-sm text-gray-400 mt-1">{era.period}</div>
-                                        </div>
-                                        <div className="text-gray-400 text-xl">›</div>
-=======
                                         <div className="mt-1">{era.icon}</div>
                                         <div className="flex-1">
                                             <div className="text-sm font-semibold">{era.title}</div>
@@ -735,28 +687,15 @@
                                         <div className="mt-1">
                                             <ArrowRight size={18} />
                                         </div>
->>>>>>> origin/main
                                     </div>
                                 ))}
                             </div>
                         )}
                         
                         {/* Sociologist List View */}
-<<<<<<< HEAD
-                        {mobileView === 'sociologists' && (
-                            <div className="h-full overflow-y-auto p-4">
-                                <button
-                                    onClick={() => setMobileView('eras')}
-                                    className="flex items-center gap-2 text-blue-400 mb-4 text-sm"
-                                >
-                                    <span className="text-xl">‹</span> 戻る
-                                </button>
-                                <h2 className="text-xl font-bold text-gray-200 mb-4">社会学者を選択</h2>
-=======
                         {mobileView === 'list' && (
                             <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
                                 <h2 className="text-lg font-semibold text-gray-300 mb-4">社会学者一覧</h2>
->>>>>>> origin/main
                                 {sociologists.map((s) => (
                                     <div
                                         key={s.id}
@@ -767,11 +706,6 @@
                                         }`}
                                         onClick={() => handleSociologistSelect(s)}
                                     >
-<<<<<<< HEAD
-                                        <div className="font-semibold">{s.name}</div>
-                                        <div className="text-sm text-gray-400 mt-1">{s.title}</div>
-                                        <div className="text-gray-400 text-sm mt-2 text-right">詳細を見る ›</div>
-=======
                                         <div className="flex items-center justify-between">
                                             <div className="flex-1">
                                                 <div className="font-semibold text-sm">{s.name}</div>
@@ -779,7 +713,6 @@
                                             </div>
                                             <ArrowRight size={18} />
                                         </div>
->>>>>>> origin/main
                                     </div>
                                 ))}
                             </div>
@@ -787,25 +720,11 @@
                         
                         {/* Content View */}
                         {mobileView === 'content' && selectedSociologist && (
-<<<<<<< HEAD
-                            <div className="h-full overflow-y-auto p-4">
-                                <button
-                                    onClick={() => setMobileView('sociologists')}
-                                    className="flex items-center gap-2 text-blue-400 mb-4 text-sm sticky top-0 bg-black py-2 z-10"
-                                >
-                                    <span className="text-xl">‹</span> 戻る
-                                </button>
-                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold text-blue-400 mb-2">{selectedSociologist.name}</h2>
-                                        <p className="text-gray-400">{selectedSociologist.title}</p>
-=======
                             <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
                                 <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
                                     <div className="mb-6">
                                         <h2 className="text-2xl font-bold text-blue-400 mb-2">{selectedSociologist.name}</h2>
                                         <p className="text-gray-400 text-base">{selectedSociologist.title}</p>
->>>>>>> origin/main
                                     </div>
                                     
                                     <div className="mb-5">
