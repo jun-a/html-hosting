@@ -300,6 +300,11 @@
             background: #6b7280;
         }
         
+        /* Placeholder text */
+        .diagram-placeholder {
+            color: #9ca3af;
+        }
+        
         /* Diagram Styles */
         .diagram-three-stages {
             display: flex;
@@ -1274,7 +1279,7 @@
                     break;
                     
                 default:
-                    container.innerHTML = '<div style="color: #9ca3af;">図解準備中</div>';
+                    container.innerHTML = '<div class="diagram-placeholder">図解準備中</div>';
             }
             
             return container;
