@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理学図鑑 - Physics Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide React icons (inline SVG components)
+        const Box = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        );
+        
+        const Maximize = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+        );
+        
+        const Atom = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="1"></circle>
+                <path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path>
+                <path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"></path>
+            </svg>
+        );
+        
+        const Circle = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+        );
+        
+        const Zap = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        // ----------------------------------------------------------------------------
+        // DATA STRUCTURE
+        // ----------------------------------------------------------------------------
+        
+        const ERAS = [
+            { id: 'classical', title: '古典力学：秩序の美', period: '1600 - 1900', icon: <Box size={18} /> },
+            { id: 'relativity', title: '相対性理論：時空', period: '1905 - 1915', icon: <Maximize size={18} /> },
+            { id: 'quantum', title: '量子力学：確率の海', period: '1900 - 1950', icon: <Atom size={18} /> },
+            { id: 'particle', title: '素粒子と標準模型', period: '1950 - 1980', icon: <Circle size={18} /> },
+            { id: 'modern', title: '現代：統一への道', period: '1980 - Present', icon: <Zap size={18} /> },
+        ];
+        
+        const PHYSICISTS = {
+            classical: [
+                {
+                    id: 'newton',
+                    name: 'アイザック・ニュートン',
+                    title: '古典力学の父',
+                    question: '物体の運動を支配する法則は何か？',
+                    answer: '3つの運動法則と万有引力の法則だ。',
+                    detail: '『プリンキピア』(1687)で運動の3法則（慣性の法則、運動方程式、作用反作用の法則）と万有引力の法則を確立。微積分を発明し、天体の運動から地上の物体まで統一的に説明した。光学にも貢献。',
+                    connection: 'ガリレオの継承者。アインシュタインに至るまで物理学の基礎。',
+                    diagramType: 'newton_laws',
+                    diagramContent: null
+                },
+                {
+                    id: 'maxwell',
+                    name: 'ジェームズ・マクスウェル',
+                    title: '電磁気学の統一者',
+                    question: '電気と磁気の本質は何か？',
+                    answer: '電磁場であり、光は電磁波だ。',
+                    detail: 'マクスウェル方程式(1865)で電気と磁気を統一。光が電磁波であることを予言し、電磁気学を完成させた。熱力学・統計力学にも貢献。相対性理論と量子論の先駆け。',
+                    connection: 'ファラデーの数学的定式化。アインシュタインに影響。',
+                    diagramType: 'em_wave',
+                    diagramContent: null
+                },
+                {
+                    id: 'boltzmann',
+                    name: 'ルートヴィヒ・ボルツマン',
+                    title: '統計力学の創始者',
+                    question: '熱とは何か？',
+                    answer: '分子の無秩序な運動だ。エントロピーは確率の対数だ。',
+                    detail: 'マクロな熱現象をミクロな分子運動から説明する統計力学を確立。ボルツマン方程式とエントロピー公式（S=k log W）で知られる。原子論が否定されていた時代に孤軍奮闘し、晩年は鬱に苦しんだ。',
+                    connection: '量子統計力学の基礎。プランクに影響。',
+                    diagramType: 'entropy',
+                    diagramContent: null
+                }
+            ],
+            relativity: [
+                {
+                    id: 'einstein_special',
+                    name: 'アルベルト・アインシュタイン（特殊相対論）',
+                    title: '時空の革命家',
+                    question: '光速は観測者によって変わるのか？',
+                    answer: 'いいえ。光速は不変で、時間と空間が相対的になる。',
+                    detail: '1905年の奇跡の年に特殊相対性理論を発表。光速不変の原理から、時間の遅れ、長さの収縮、質量とエネルギーの等価性（E=mc²）を導いた。絶対時間・絶対空間を否定し、時空の概念を革新。',
+                    connection: 'マクスウェル方程式の要請。一般相対論へ。',
+                    diagramType: 'special_relativity',
+                    diagramContent: null
+                },
+                {
+                    id: 'einstein_general',
+                    name: 'アルベルト・アインシュタイン（一般相対論）',
+                    title: '重力の幾何学者',
+                    question: '重力とは何か？',
+                    answer: '時空の歪みだ。質量が時空を曲げる。',
+                    detail: '1915年に一般相対性理論を完成。重力をニュートンの「力」ではなく、時空の幾何学的な曲がりとして解釈。水星の近日点移動、光の曲がり、ブラックホール、重力波、宇宙膨張を予言。',
+                    connection: 'リーマン幾何学を応用。現代宇宙論の基礎。',
+                    diagramType: 'spacetime_curvature',
+                    diagramContent: null
+                }
+            ],
+            quantum: [
+                {
+                    id: 'bohr',
+                    name: 'ニールス・ボーア',
+                    title: '量子論の先駆者',
+                    question: '原子はどうして安定なのか？',
+                    answer: '電子は特定の軌道しか取れないからだ（量子化）。',
+                    detail: 'ボーア模型(1913)で、電子が特定のエネルギー準位にしか存在できないことを示し、原子スペクトルを説明。コペンハーゲン解釈で量子力学の基礎を築いた。「神はサイコロを振らない」と言うアインシュタインと論争。',
+                    connection: 'プランクとアインシュタインの継承。量子力学の父。',
+                    diagramType: 'bohr_model',
+                    diagramContent: null
+                },
+                {
+                    id: 'schrodinger',
+                    name: 'エルヴィン・シュレーディンガー',
+                    title: '波動関数の発見者',
+                    question: '電子は粒子か波か？',
+                    answer: '両方だ。波動関数で記述される。',
+                    detail: 'シュレーディンガー方程式(1926)で量子力学を数学的に完成。電子を波動関数（確率の波）として記述。「シュレーディンガーの猫」の思考実験で量子の不思議さを示した。',
+                    connection: 'ド・ブロイの物質波の定式化。量子化学の基礎。',
+                    diagramType: 'wave_function',
+                    diagramContent: null
+                }
+            ],
+            particle: [
+                {
+                    id: 'feynman',
+                    name: 'リチャード・ファインマン',
+                    title: '量子電磁力学の巨匠',
+                    question: '光と物質はどう相互作用するか？',
+                    answer: '仮想粒子を交換する。ファインマン図で視覚化できる。',
+                    detail: '量子電磁力学（QED）を完成させ、ノーベル賞受賞(1965)。ファインマン図という直感的な可視化手法を開発。「経路積分」の定式化で量子力学に新しい視点をもたらした。優れた教育者でもあった。',
+                    connection: '場の量子論の確立。素粒子物理学の基礎。',
+                    diagramType: 'feynman_diagram',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'hawking',
+                    name: 'スティーヴン・ホーキング',
+                    title: 'ブラックホールの理論家',
+                    question: 'ブラックホールは永遠に黒いのか？',
+                    answer: 'いいえ。量子効果で放射し、蒸発する（ホーキング放射）。',
+                    detail: '一般相対論と量子論を統合し、ブラックホールが熱放射することを発見(1974)。特異点定理でペンローズとノーベル賞級の業績。ALSと闘いながら『ホーキング、宇宙を語る』で科学の大衆化に貢献。',
+                    connection: 'アインシュタインの継承者。量子重力理論への道。',
+                    diagramType: 'black_hole',
+                    diagramContent: null
+                },
+                {
+                    id: 'string',
+                    name: '超弦理論',
+                    title: '究極の統一理論？',
+                    question: '重力と量子論を統一できるか？',
+                    answer: '粒子は点ではなく「ひも（弦）」だとすればできる。',
+                    detail: '1970年代から発展。素粒子を0次元の点ではなく1次元の弦として扱い、重力を含むすべての力を統一しようとする理論。10次元や11次元の時空を要求し、実験的検証が困難なため「万物の理論（TOE）」か「数学の遊び」か論争が続く。',
+                    connection: 'M理論、ループ量子重力など競合理論も存在。',
+                    diagramType: 'string_theory',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ----------------------------------------------------------------------------
+        // DIAGRAM BUILDER
+        // ----------------------------------------------------------------------------
+        
+        const DiagramBuilder = ({ type, content }) => {
+            if (type === 'newton_laws') {
+                return (
+                    <div className="flex flex-col gap-2 p-4">
+                        <div className="bg-purple-900 p-3 rounded text-sm">1. 慣性の法則</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm">2. F = ma</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm">3. 作用反作用</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'em_wave') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">〰️</div>
+                        <div className="text-lg font-bold text-blue-400">電磁波</div>
+                        <div className="text-xs text-gray-400 mt-2">E⊥B, 光速c</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'entropy') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-yellow-500 mb-2">S = k log W</div>
+                        <div className="text-sm text-gray-400">エントロピー＝乱雑さ</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'special_relativity') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-cyan-400 mb-2">E = mc²</div>
+                        <div className="text-xs text-gray-400 mt-2">時間の遅れ・長さの収縮</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'spacetime_curvature') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-40 h-24">
+                            <svg viewBox="0 0 160 100" className="w-full h-full">
+                                <path d="M 10,30 Q 80,60 150,30" stroke="#8b5cf6" strokeWidth="2" fill="none" />
+                                <path d="M 10,50 Q 80,80 150,50" stroke="#8b5cf6" strokeWidth="2" fill="none" />
+                                <circle cx="80" cy="65" r="8" fill="#ef4444" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">質量が時空を曲げる</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'bohr_model') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-32 h-32">
+                            <div className="absolute inset-0 border-2 border-blue-500 rounded-full"></div>
+                            <div className="absolute inset-4 border-2 border-blue-400 rounded-full"></div>
+                            <div className="absolute inset-8 border-2 border-blue-300 rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full"></div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">量子化された軌道</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'wave_function') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-purple-400 mb-2">Ψ(x,t)</div>
+                        <div className="text-xs text-gray-400">確率振幅の波</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'feynman_diagram') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-32 h-24">
+                            <svg viewBox="0 0 128 96" className="w-full h-full">
+                                <line x1="10" y1="20" x2="50" y2="48" stroke="#60a5fa" strokeWidth="2" />
+                                <line x1="10" y1="76" x2="50" y2="48" stroke="#60a5fa" strokeWidth="2" />
+                                <path d="M 50,48 Q 64,30 78,48" stroke="#fbbf24" strokeWidth="2" fill="none" strokeDasharray="3,3" />
+                                <line x1="78" y1="48" x2="118" y2="20" stroke="#60a5fa" strokeWidth="2" />
+                                <line x1="78" y1="48" x2="118" y2="76" stroke="#60a5fa" strokeWidth="2" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">粒子の相互作用</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'black_hole') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-24 h-24 bg-black rounded-full border-4 border-purple-500 flex items-center justify-center">
+                            <div className="text-white text-xs">事象の地平面</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">ホーキング放射</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'string_theory') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🎻</div>
+                        <div className="text-lg font-bold text-green-400">弦（ひも）</div>
+                        <div className="text-xs text-gray-400 mt-2">10次元の時空</div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        // ----------------------------------------------------------------------------
+        // MAIN APP
+        // ----------------------------------------------------------------------------
+        
+        const PhysicsApp = () => {
+            const [selectedEra, setSelectedEra] = useState('classical');
+            const [selectedPhysicist, setSelectedPhysicist] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const physicists = PHYSICISTS[selectedEra] || [];
+                setSelectedPhysicist(physicists[0] || null);
+            }, [selectedEra]);
+            
+            const physicists = PHYSICISTS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePhysicistSelect = (physicist) => {
+                setSelectedPhysicist(physicist);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    {/* Header */}
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                    物理学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Physics Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                物理学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Physics Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-purple-900 border border-purple-600 shadow-lg shadow-purple-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">物理学者一覧</h2>
+                            {physicists.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPhysicist?.id === p.id
+                                            ? 'bg-purple-900/50 border border-purple-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPhysicist(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPhysicist && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-purple-400 mb-3">{selectedPhysicist.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPhysicist.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPhysicist.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPhysicist.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPhysicist.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPhysicist.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPhysicist.diagramType} content={selectedPhysicist.diagramContent} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">物理学者一覧</h2>
+                                {physicists.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPhysicist?.id === p.id
+                                                ? 'bg-purple-900/50 border border-purple-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePhysicistSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPhysicist && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-purple-400 mb-2">{selectedPhysicist.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPhysicist.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPhysicist.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPhysicist.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPhysicist.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPhysicist.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPhysicist.diagramType} content={selectedPhysicist.diagramContent} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PhysicsApp />);
+    </script>
+</body>
+</html>
