@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社会学図鑑 - Sociology Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide React icons (inline SVG components)
+        const Users = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+        
+        const Globe = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+        );
+        
+        const Box = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        );
+        
+        const Layers = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+        );
+        
+        const Zap = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+        );
+        
+        const MessageCircle = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+        );
+        
+        const LayoutGrid = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        // ----------------------------------------------------------------------------
+        // DATA STRUCTURE (社会学者のデータ)
+        // ----------------------------------------------------------------------------
+        
+        const ERAS = [
+            { id: 'founders', title: '創始期：社会の発見', period: '1800 - 1890', icon: <Globe size={18} /> },
+            { id: 'classical', title: '古典期：三大巨匠', period: '1890 - 1920', icon: <Box size={18} /> },
+            { id: 'american', title: '米国期：機能と構造', period: '1920 - 1960', icon: <Layers size={18} /> },
+            { id: 'critical', title: '批判理論：フランクフルト', period: '1930 - 1970', icon: <Zap size={18} /> },
+            { id: 'interaction', title: '微視的：相互作用論', period: '1950 - 1980', icon: <MessageCircle size={18} /> },
+            { id: 'contemporary', title: '現代：構造と主体', period: '1970 - Present', icon: <LayoutGrid size={18} /> },
+        ];
+        
+        const SOCIOLOGISTS = {
+            // --- FOUNDERS ---
+            founders: [
+                {
+                    id: 'comte',
+                    name: 'オーギュスト・コント',
+                    title: '社会学の父',
+                    question: '社会を「科学」として研究できるか？',
+                    answer: 'できる。神学→形而上学→実証的段階へと進歩する「社会物理学」だ。',
+                    detail: '「社会学（Sociologie）」という言葉を作った人物。人間の知識や社会の発展は3つの段階（三段階の法則）を経ると説き、観察と実験に基づく実証主義を提唱した。',
+                    connection: '師はサン＝シモン。J.S.ミルに影響。',
+                    diagramType: 'three_stages',
+                    diagramContent: { one: '神学的段階', two: '形而上学的段階', three: '実証的段階' }
+                },
+                {
+                    id: 'spencer',
+                    name: 'ハーバート・スペンサー',
+                    title: '社会ダーウィニズムの祖',
+                    question: '社会はどのように発展するのか？',
+                    answer: '生物と同じように「進化」する。適者生存が原則だ。',
+                    detail: 'ダーウィンの進化論を社会に適用。社会は単純な軍事型から、複雑な産業型へと進化するとした。「自由放任（レッセ・フェール）」を支持し、福祉による弱者救済は進化を妨げると主張したため、後に批判された。',
+                    connection: '進化論的アプローチの確立。',
+                    diagramType: 'evolution',
+                    diagramContent: { from: '軍事型社会 (強制)', to: '産業型社会 (自由契約)' }
+                },
+                {
+                    id: 'marx',
+                    name: 'カール・マルクス',
+                    title: '闘争の社会学者',
+                    question: '社会の真の姿は何で決まるか？',
+                    answer: '「下部構造（経済）」がすべてを決める。歴史は階級闘争だ。',
+                    detail: '社会学の巨匠の一人だが、本人は経済学者・革命家。社会を「資本家（ブルジョワ）」と「労働者（プロレタリアート）」の対立構造として捉え、資本主義はいずれ崩壊して共産主義へ移行すると予言した。',
+                    connection: 'ウェーバーらとの対比で重要。',
+                    diagramType: 'pyramid_struggle',
+                    diagramContent: null
+                },
+            ],
+            
+            // --- CLASSICAL ---
+            classical: [
+                {
+                    id: 'durkheim',
+                    name: 'エミール・デュルケーム',
+                    title: '社会学の擁護者',
+                    question: '自殺のような個人的行為に、社会的な原因はあるか？',
+                    answer: 'ある。自殺は「社会的事実」であり、結束力の弱さが原因だ。',
+                    detail: '社会学を心理学から独立させた。「社会的事実（個人の外にあって個人を拘束するもの）」を研究対象とした。『自殺論』では、アノミー（無規範）的自殺や自己本位的自殺など、社会統合の度合いで自殺を分類した。',
+                    connection: 'フランス社会学派の祖。',
+                    diagramType: 'suicide_types',
+                    diagramContent: null
+                },
+                {
+                    id: 'weber',
+                    name: 'マックス・ウェーバー',
+                    title: '理解社会学の巨匠',
+                    question: 'なぜ西洋だけで合理的な資本主義が生まれたのか？',
+                    answer: 'プロテスタントの「禁欲」の精神が、逆説的に金儲けを肯定したからだ。',
+                    detail: '個人の主観的な意味（動機）を理解しようとした。近代化を「合理化（脱魔術化）」の過程として捉え、その行き着く先として「官僚制」や、人間を縛る「鉄の檻」を予見した。支配の三類型（伝統的・カリスマ的・合法的）も有名。',
+                    connection: 'マルクスの唯物論に対し、精神（宗教）の力を重視。',
+                    diagramType: 'iron_cage',
+                    diagramContent: null
+                },
+                {
+                    id: 'simmel',
+                    name: 'ゲオルク・ジンメル',
+                    title: '形式社会学の祖',
+                    question: '社会とは実体なのか？',
+                    answer: 'いいえ、社会とは個人間の「相互作用の形式」である。',
+                    detail: '「社会」という巨大な生き物はいない。あるのは人々の関係性（相互作用）だけだ。「よそ者」「二人組と三人組」「貨幣の哲学」など、微細な人間関係のパターン（形式）を分析した。',
+                    connection: 'シカゴ学派や相互作用論に影響。',
+                    diagramType: 'interaction_web',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- AMERICAN ---
+            american: [
+                {
+                    id: 'parsons',
+                    name: 'タルコット・パーソンズ',
+                    title: '構造機能主義の帝王',
+                    question: 'なぜ社会はバラバラにならず、秩序を保てるのか？',
+                    answer: '社会システムには、生存に必要な4つの機能（AGIL）が備わっているからだ。',
+                    detail: '20世紀半ばのアメリカ社会学を支配した。社会を一つの巨大なシステムと見なし、経済・政治・法・文化がそれぞれ役割（機能）を果たして均衡を保っていると説いた（AGIL図式）。',
+                    connection: 'ウェーバーやデュルケームを統合。',
+                    diagramType: 'agil',
+                    diagramContent: { A: '適応(経済)', G: '目標達成(政治)', I: '統合(法・慣習)', L: '潜在的維持(教育・文化)' }
+                },
+                {
+                    id: 'merton',
+                    name: 'ロバート・K・マートン',
+                    title: '中範囲の理論家',
+                    question: '良い意図で行った政策が、悪い結果を生むのはなぜか？',
+                    answer: '社会現象には「予期せざる結果」や「潜在的機能」があるからだ。',
+                    detail: 'パーソンズの壮大すぎる理論を修正。物事には目に見える「顕在的機能」と、隠れた「潜在的機能」があるとした。「予言の自己成就」や、成功への道が閉ざされた時に犯罪が起きる「アノミー理論」で有名。',
+                    connection: 'パーソンズの弟子だが批判的継承。',
+                    diagramType: 'latent_function',
+                    diagramContent: { manifest: '雨乞い→雨を願う', latent: '雨乞い→集団の結束を高める' }
+                },
+            ],
+            
+            // --- CRITICAL THEORY ---
+            critical: [
+                {
+                    id: 'adorno',
+                    name: 'アドルノ & ホルクハイマー',
+                    title: 'フランクフルト学派',
+                    question: '理性が発達した近代が、なぜナチスのような野蛮を生んだのか？',
+                    answer: '理性が「道具」になり下がり、自然や人間を支配する凶器になったからだ。',
+                    detail: '『啓蒙の弁証法』。理性を批判的に検討。大衆文化（映画やジャズ）を「文化産業」と呼び、人々を思考停止させ、体制に従順な「ロボット」にする装置だと激しく批判した。',
+                    connection: 'マルクス主義と精神分析を統合。',
+                    diagramType: 'culture_industry',
+                    diagramContent: null
+                },
+                {
+                    id: 'habermas',
+                    name: 'ユルゲン・ハーバーマス',
+                    title: '討議倫理の哲学者',
+                    question: '金と権力に支配された社会をどう修復するか？',
+                    answer: '「対話（コミュニケーション的行為）」による合意形成を取り戻せ。',
+                    detail: 'フランクフルト学派第二世代。「システム（市場・行政）」が「生活世界（日常の対話）」を侵食していると警告（生活世界の植民地化）。対等な対話の場（公共圏）の再生を説いた。',
+                    connection: '現代ドイツの最高峰。',
+                    diagramType: 'system_lifeworld',
+                    diagramContent: { system: '金・権力 (システム)', lifeworld: '対話・合意 (生活世界)', action: '侵食' }
+                },
+            ],
+            
+            // --- INTERACTIONISM ---
+            interaction: [
+                {
+                    id: 'mead',
+                    name: 'G.H. ミード',
+                    title: '社会心理学の創始者',
+                    question: '「私（自我）」はどうやって生まれるのか？',
+                    answer: '他者の視点を取り入れること（役割取得）によって生まれる。',
+                    detail: '最初から「私」がいるのではない。ごっこ遊びやゲームを通じて、「一般化された他者（みんな）」の視点を自分の中に取り込むことで、客観的な「私（Me）」が形成される。',
+                    connection: 'シンボリック相互作用論の源流。',
+                    diagramType: 'mirror_self',
+                    diagramContent: null
+                },
+                {
+                    id: 'goffman',
+                    name: 'アーヴィング・ゴフマン',
+                    title: 'ドラマトゥルギー',
+                    question: '私たちは日常で何をしているのか？',
+                    answer: '誰もが舞台の上で「演技」をしている俳優である。',
+                    detail: '社会生活を「演劇」になぞらえた。人は「表舞台」で理想の自分を演じ（印象操作）、「舞台裏」で素に戻る。精神病院の研究（『アサイラム』）では、施設が人のアイデンティティを剥奪する様を描いた。',
+                    connection: 'ミクロ社会学の天才。',
+                    diagramType: 'theater',
+                    diagramContent: { front: '表舞台 (演技)', back: '舞台裏 (本音)' }
+                },
+            ],
+            
+            // --- CONTEMPORARY ---
+            contemporary: [
+                {
+                    id: 'bourdieu',
+                    name: 'ピエール・ブルデュー',
+                    title: '文化資本の社会学者',
+                    question: 'なぜ格差は再生産されるのか？',
+                    answer: '親から子へ、金だけでなく「趣味・センス（文化資本）」が継承されるからだ。',
+                    detail: '「学校」は公平に見えて、実は上流階級の文化（ハビトゥス）を持つ子に有利なルールで動いている。クラシック音楽を好むか演歌を好むかといった「趣味（ディスタンクシオン）」こそが、階級を分ける武器になる。',
+                    connection: '構造と主体を統合。',
+                    diagramType: 'cultural_capital',
+                    diagramContent: null
+                },
+                {
+                    id: 'foucault',
+                    name: 'ミシェル・フーコー',
+                    title: '権力の解剖学者',
+                    question: '権力はどこにあるのか？',
+                    answer: '王様の命令ではなく、学校や病院の「規律」として日常に埋め込まれている。',
+                    detail: '「パノプティコン（一望監視施設）」のモデルを用い、近代社会は人々が自発的に規律を守るように訓練される「監獄」であると説いた。知（学問）と権力は一体である。',
+                    connection: 'ポスト構造主義。',
+                    diagramType: 'panopticon',
+                    diagramContent: null
+                },
+                {
+                    id: 'baudrillard',
+                    name: 'ジャン・ボードリヤール',
+                    title: 'シミュラークルの予言者',
+                    question: '消費社会で、私たちは何を買っているのか？',
+                    answer: 'モノの機能ではなく、「記号（ブランド・イメージ）」を買っている。',
+                    detail: '現代はオリジナルなきコピー（シミュラークル）が現実よりもリアルになった「ハイパーリアル」の世界。ディズニーランドこそがリアルで、外の世界が虚構になりつつある。マトリックスの元ネタ。',
+                    connection: 'ポストモダン社会学。',
+                    diagramType: 'simulacra',
+                    diagramContent: null
+                },
+                {
+                    id: 'giddens',
+                    name: 'アンソニー・ギデンズ',
+                    title: '第三の道',
+                    question: '伝統が消えた世界で、私たちはどう生きるか？',
+                    answer: '常に情報を反省し、自分の人生を再構築し続ける（再帰的近代化）。',
+                    detail: '構造化理論：社会構造は人間を縛るが、人間もまた構造を作り変えることができる。現代は「伝統」のガイドラインがないため、恋愛も仕事も自分で選び続けなければならない（自己のアイデンティティ計画）。',
+                    connection: 'ブレア政権のブレーン。',
+                    diagramType: 'structuration',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ----------------------------------------------------------------------------
+        // DIAGRAM BUILDER
+        // ----------------------------------------------------------------------------
+        
+        const DiagramBuilder = ({ type, content }) => {
+            if (type === 'three_stages') {
+                return (
+                    <div className="flex justify-around items-end p-4">
+                        <div className="flex flex-col items-center">
+                            <div className="bg-pink-900 text-white p-3 rounded text-sm text-center w-24 h-16 flex items-center justify-center">{content.one}</div>
+                        </div>
+                        <div className="text-yellow-500 text-2xl mb-4">→</div>
+                        <div className="flex flex-col items-center">
+                            <div className="bg-blue-900 text-white p-3 rounded text-sm text-center w-24 h-20 flex items-center justify-center">{content.two}</div>
+                        </div>
+                        <div className="text-yellow-500 text-2xl mb-6">→</div>
+                        <div className="flex flex-col items-center">
+                            <div className="bg-orange-900 text-white p-3 rounded text-sm text-center w-24 h-24 flex items-center justify-center">{content.three}</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'evolution') {
+                return (
+                    <div className="flex justify-around items-center p-4">
+                        <div className="bg-gray-700 text-white p-4 rounded text-sm text-center">{content.from}</div>
+                        <div className="text-yellow-500 text-2xl animate-pulse">→</div>
+                        <div className="bg-green-800 text-white p-4 rounded text-sm text-center">{content.to}</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'pyramid_struggle') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="bg-yellow-600 text-black p-2 rounded text-sm mb-2 px-8">ブルジョワ</div>
+                        <div className="text-red-500 text-xl">⚔️</div>
+                        <div className="bg-blue-900 text-white p-2 rounded text-sm mt-2 px-6">プロレタリアート</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'suicide_types') {
+                return (
+                    <div className="grid grid-cols-2 gap-3 p-4">
+                        <div className="bg-blue-900 p-3 rounded text-sm text-center">自己本位的自殺</div>
+                        <div className="bg-green-900 p-3 rounded text-sm text-center">集団本位的自殺</div>
+                        <div className="bg-red-900 p-3 rounded text-sm text-center">アノミー的自殺</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm text-center">宿命的自殺</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'iron_cage') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">⛓️</div>
+                        <div className="text-lg font-bold text-yellow-500">鉄の檻</div>
+                        <div className="text-sm text-gray-400 mt-2 text-center">合理化の行き着く先<br/>官僚制による束縛</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'interaction_web') {
+                return (
+                    <div className="flex justify-center items-center p-4">
+                        <div className="relative w-48 h-48">
+                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center text-xs">A</div>
+                            <div className="absolute bottom-0 left-0 bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center text-xs">B</div>
+                            <div className="absolute bottom-0 right-0 bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center text-xs">C</div>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-yellow-500 text-sm">相互作用</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'agil') {
+                return (
+                    <div className="grid grid-cols-2 gap-3 p-4">
+                        <div className="bg-blue-900 p-3 rounded text-sm text-center font-bold">{content.A}</div>
+                        <div className="bg-green-900 p-3 rounded text-sm text-center font-bold">{content.G}</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm text-center font-bold">{content.I}</div>
+                        <div className="bg-orange-900 p-3 rounded text-sm text-center font-bold">{content.L}</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'latent_function') {
+                return (
+                    <div className="flex flex-col gap-3 p-4">
+                        <div className="bg-green-800 p-3 rounded text-sm">
+                            <div className="font-bold mb-1">顕在的機能:</div>
+                            {content.manifest}
+                        </div>
+                        <div className="bg-purple-900 p-3 rounded text-sm">
+                            <div className="font-bold mb-1">潜在的機能:</div>
+                            {content.latent}
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'culture_industry') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">📺</div>
+                        <div className="text-lg font-bold text-red-500">文化産業</div>
+                        <div className="text-sm text-gray-400 mt-2 text-center">大衆を思考停止させる<br/>管理のための装置</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'system_lifeworld') {
+                return (
+                    <div className="flex flex-col items-center p-4 gap-3">
+                        <div className="flex justify-around items-center w-full">
+                            <div className="bg-red-900 p-4 rounded text-sm text-center">{content.system}</div>
+                            <div className="text-yellow-500 text-2xl">→</div>
+                            <div className="bg-green-900 p-4 rounded text-sm text-center">{content.lifeworld}</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">{content.action}</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'mirror_self') {
+                return (
+                    <div className="flex justify-center items-center p-4">
+                        <div className="flex items-center gap-4">
+                            <div className="text-4xl">👤</div>
+                            <div className="text-2xl">↔️</div>
+                            <div className="text-4xl">👥</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'theater') {
+                return (
+                    <div className="flex justify-around items-center p-4">
+                        <div className="bg-blue-900 p-4 rounded text-sm text-center">{content.front}</div>
+                        <div className="text-gray-500 text-2xl">🎭</div>
+                        <div className="bg-gray-800 p-4 rounded text-sm text-center">{content.back}</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'cultural_capital') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🎻</div>
+                        <div className="text-lg font-bold text-purple-500">文化資本</div>
+                        <div className="text-sm text-gray-400 mt-2 text-center">趣味・センス・教育<br/>階級の再生産</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'panopticon') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative">
+                            <div className="w-24 h-24 rounded-full border-4 border-gray-500 flex items-center justify-center">
+                                <div className="text-4xl">👁️</div>
+                            </div>
+                            <div className="absolute -top-2 -right-2 w-4 h-4 bg-gray-500 rounded-full"></div>
+                            <div className="absolute -top-2 -left-2 w-4 h-4 bg-gray-500 rounded-full"></div>
+                            <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-gray-500 rounded-full"></div>
+                            <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-gray-500 rounded-full"></div>
+                        </div>
+                        <div className="text-sm text-gray-400 mt-3 text-center">一望監視施設<br/>規律訓練権力</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'simulacra') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🎪</div>
+                        <div className="text-lg font-bold text-pink-500">シミュラークル</div>
+                        <div className="text-sm text-gray-400 mt-2 text-center">オリジナルなきコピー<br/>ハイパーリアル</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'structuration') {
+                return (
+                    <div className="flex justify-center items-center p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gray-700 p-3 rounded text-sm">構造</div>
+                            <div className="text-2xl">↔️</div>
+                            <div className="bg-blue-900 p-3 rounded text-sm">主体</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        // ----------------------------------------------------------------------------
+        // MAIN APP
+        // ----------------------------------------------------------------------------
+        
+        const SociologyApp = () => {
+            const [selectedEra, setSelectedEra] = useState('founders');
+            const [selectedSociologist, setSelectedSociologist] = useState(null);
+            
+            useEffect(() => {
+                const sociologists = SOCIOLOGISTS[selectedEra] || [];
+                setSelectedSociologist(sociologists[0] || null);
+            }, [selectedEra]);
+            
+            const sociologists = SOCIOLOGISTS[selectedEra] || [];
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    {/* Header */}
+                    <header className="border-b border-gray-800 bg-gray-900 p-6 text-center">
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            社会学図鑑
+                        </h1>
+                        <p className="text-gray-400 text-sm mt-2">Sociology Illustrated Book</p>
+                    </header>
+                    
+                    <div className="flex h-[calc(100vh-120px)]">
+                        {/* Left Sidebar - Eras */}
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-blue-900 border border-blue-600 shadow-lg shadow-blue-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {/* Middle Sidebar - Sociologists */}
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">社会学者一覧</h2>
+                            {sociologists.map((s) => (
+                                <div
+                                    key={s.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedSociologist?.id === s.id
+                                            ? 'bg-blue-900/50 border border-blue-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedSociologist(s)}
+                                >
+                                    <div className="font-semibold text-sm">{s.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{s.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {/* Main Content Area */}
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-8">
+                            {selectedSociologist ? (
+                                <div className="max-w-3xl mx-auto bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                    <div className="mb-8">
+                                        <h2 className="text-3xl font-bold text-blue-400 mb-2">{selectedSociologist.name}</h2>
+                                        <p className="text-gray-400 text-lg">{selectedSociologist.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300">{selectedSociologist.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold">{selectedSociologist.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedSociologist.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedSociologist.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedSociologist.diagramType} content={selectedSociologist.diagramContent} />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center text-gray-500 py-16">
+                                    社会学者を選択してください
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SociologyApp />);
+    </script>
+</body>
+</html>
