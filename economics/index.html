@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>経済学図鑑 - Economics Illustrated Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #1f2937;
+            background-color: #111827;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #10b981, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: #9ca3af;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Left sidebar - Eras */
+        .era-sidebar {
+            width: 16rem;
+            background-color: #111827;
+            border-right: 1px solid #1f2937;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .era-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: #1f2937;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .era-item:hover {
+            background-color: #374151;
+        }
+        
+        .era-item.active {
+            background-color: #065f46;
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .era-icon {
+            font-size: 1.125rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        
+        .era-info {
+            flex: 1;
+        }
+        
+        .era-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+        
+        .era-period {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        
+        /* Center - Economist cards */
+        .economist-grid {
+            flex: 1;
+            background-color: #0f172a;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .economist-card {
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .economist-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+            transform: translateY(-4px);
+        }
+        
+        .economist-card.selected {
+            border-color: #10b981;
+            background-color: #065f46;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+        }
+        
+        .economist-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        
+        .economist-title {
+            font-size: 0.875rem;
+            color: #fbbf24;
+            margin-bottom: 0.75rem;
+        }
+        
+        .economist-question {
+            font-size: 0.875rem;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+        
+        /* Right side - Detail view */
+        .detail-area {
+            width: 40rem;
+            background-color: #111827;
+            border-left: 1px solid #1f2937;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            font-size: 1.125rem;
+        }
+        
+        .detail-card {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .detail-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #1f2937;
+        }
+        
+        .detail-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-title {
+            font-size: 1.125rem;
+            color: #fbbf24;
+        }
+        
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+        
+        .detail-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .detail-section p {
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+        
+        .question {
+            color: #fbbf24;
+        }
+        
+        .answer {
+            color: #34d399;
+        }
+        
+        .answer-text {
+            background-color: #064e3b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #10b981;
+        }
+        
+        .detail {
+            color: #60a5fa;
+        }
+        
+        .detail-text {
+            background-color: #1e3a8a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .connection {
+            color: #f472b6;
+        }
+        
+        .connection-text {
+            background-color: #831843;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .diagram {
+            color: #a78bfa;
+        }
+        
+        .diagram-container {
+            background-color: #1f2937;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-top: 0.75rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* Diagram Styles */
+        .diagram-invisible-hand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-invisible-hand .hand {
+            font-size: 4rem;
+        }
+        
+        .diagram-invisible-hand .flow {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .diagram-invisible-hand .box {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid;
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-invisible-hand .arrow {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-comparative-advantage {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .diagram-comparative-advantage .country {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-comparative-advantage .country-a {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-comparative-advantage .country-b {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-comparative-advantage .result {
+            background-color: #065f46;
+            border-color: #10b981;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+            font-weight: bold;
+        }
+        
+        .diagram-malthus-curve {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-malthus-curve .line {
+            width: 300px;
+            height: 3px;
+            position: relative;
+        }
+        
+        .diagram-malthus-curve .population {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            height: 6px;
+        }
+        
+        .diagram-malthus-curve .food {
+            background: linear-gradient(to right, #10b981, #059669);
+            height: 3px;
+        }
+        
+        .diagram-malthus-curve .label {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .diagram-equilibrium {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+        
+        .diagram-equilibrium .line {
+            position: absolute;
+            width: 3px;
+            height: 280px;
+            background-color: #3b82f6;
+        }
+        
+        .diagram-equilibrium .supply {
+            transform: rotate(45deg);
+            background-color: #ef4444;
+        }
+        
+        .diagram-equilibrium .demand {
+            transform: rotate(-45deg);
+            background-color: #10b981;
+        }
+        
+        .diagram-equilibrium .point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #fbbf24;
+            border: 3px solid #ffffff;
+            z-index: 10;
+        }
+        
+        .diagram-supply-demand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-supply-demand .scissors {
+            font-size: 4rem;
+        }
+        
+        .diagram-supply-demand .blades {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .diagram-supply-demand .blade {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid;
+        }
+        
+        .diagram-supply-demand .supply {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-supply-demand .demand {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-surplus-value {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-surplus-value .bar {
+            width: 300px;
+            display: flex;
+            height: 60px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .diagram-surplus-value .wage {
+            flex: 1;
+            background-color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #000;
+        }
+        
+        .diagram-surplus-value .surplus {
+            flex: 1;
+            background-color: #7c2d12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .diagram-surplus-value .label {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .diagram-public-spending {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-public-spending .gov {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #065f46;
+            border: 3px solid #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        .diagram-public-spending .arrows {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .diagram-public-spending .arrow {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-public-spending .boxes {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .diagram-public-spending .box {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #1e3a8a;
+            border: 2px solid #3b82f6;
+        }
+        
+        .diagram-small-gov {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-small-gov .comparison {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .diagram-small-gov .gov-big {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #7c2d12;
+            border: 3px solid #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .diagram-small-gov .vs {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-small-gov .gov-small {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #065f46;
+            border: 3px solid #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .diagram-dispersed-knowledge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 250px;
+        }
+        
+        .diagram-dispersed-knowledge .center {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #7c2d12;
+            border: 3px solid #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            z-index: 10;
+        }
+        
+        .diagram-dispersed-knowledge .node {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #065f46;
+            border: 2px solid #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            font-size: 1rem;
+        }
+        
+        .diagram-dispersed-knowledge .node:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        .diagram-dispersed-knowledge .node:nth-child(3) { top: 30%; right: 10%; }
+        .diagram-dispersed-knowledge .node:nth-child(4) { bottom: 30%; right: 10%; }
+        .diagram-dispersed-knowledge .node:nth-child(5) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .diagram-dispersed-knowledge .node:nth-child(6) { bottom: 30%; left: 10%; }
+        .diagram-dispersed-knowledge .node:nth-child(7) { top: 30%; left: 10%; }
+        
+        .diagram-nash-equilibrium {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .diagram-nash-equilibrium .table {
+            display: grid;
+            grid-template-columns: 100px 150px 150px;
+            gap: 2px;
+            background-color: #4b5563;
+        }
+        
+        .diagram-nash-equilibrium .cell {
+            background-color: #1f2937;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .diagram-nash-equilibrium .header {
+            background-color: #374151;
+            font-weight: bold;
+        }
+        
+        .diagram-nash-equilibrium .equilibrium {
+            background-color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        .diagram-prospect-curve {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-prospect-curve .curve {
+            width: 250px;
+            height: 200px;
+            border-left: 3px solid #9ca3af;
+            border-bottom: 3px solid #9ca3af;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .diagram-prospect-curve .gain {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #10b981;
+        }
+        
+        .diagram-prospect-curve .loss {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .diagram-capability {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .diagram-capability .item {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid;
+        }
+        
+        .diagram-capability .gdp {
+            background-color: #4b5563;
+            border-color: #9ca3af;
+        }
+        
+        .diagram-capability .cap {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-r-g-inequality {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-r-g-inequality .formula {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ef4444;
+        }
+        
+        .diagram-r-g-inequality .explanation {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .diagram-r-g-inequality .box {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-r-g-inequality .r {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-r-g-inequality .g {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 経済学図鑑 - Economics Encyclopedia</h1>
+            <p>富の源泉から現代まで：経済学者たちの系譜</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left sidebar: Eras -->
+            <div class="era-sidebar" id="eraSidebar"></div>
+            
+            <!-- Center: Economist grid -->
+            <div class="economist-grid" id="economistGrid"></div>
+            
+            <!-- Right: Detail view -->
+            <div class="detail-area" id="detailArea">
+                <div class="empty-state">
+                    経済学者を選択してください
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================================================
+        // DATA STRUCTURE
+        // ============================================================================
+        
+        const ERAS = [
+            { id: 'classical', title: '古典派：富の源泉', period: '1776 - 1870', icon: '⚓' },
+            { id: 'neoclassical', title: '新古典派：限界革命', period: '1870 - 1930', icon: '📊' },
+            { id: 'marxist', title: 'マルクス経済学', period: '1867 - 1920', icon: '📦' },
+            { id: 'keynesian', title: 'ケインズ革命：巨視', period: '1936 - 1970', icon: '📈' },
+            { id: 'libertarian', title: '新自由主義：市場重視', period: '1970 - 2000', icon: '⚡' },
+            { id: 'game', title: 'ゲーム理論と制度', period: '1950 - Present', icon: '📐' },
+            { id: 'behavioral', title: '現代：行動と格差', period: '1990 - Present', icon: '🧠' }
+        ];
+        
+        const ECONOMISTS = {
+            classical: [
+                {
+                    id: 'smith',
+                    name: 'アダム・スミス',
+                    title: '経済学の父',
+                    question: '個人の利己心は社会にとって悪か？',
+                    answer: 'いいえ。「神の見えざる手」によって、結果的に社会全体の利益になる。',
+                    detail: '『国富論』。重商主義（国家による介入）を批判。パン屋がパンを焼くのは慈善ではなく自分の利益のためだが、それが市場メカニズムを通じて社会を豊かにする。分業の重要性も説いた。',
+                    connection: '道徳哲学教授。近代経済学の始祖。',
+                    diagramType: 'invisible_hand',
+                    diagramContent: null
+                },
+                {
+                    id: 'ricardo',
+                    name: 'デヴィッド・リカード',
+                    title: '自由貿易の理論家',
+                    question: '弱小国は貿易しても損するだけか？',
+                    answer: '違う。「比較優位」があれば、双方が得をする。',
+                    detail: 'たとえ全ての製品でA国がB国より優れていても、A国は「最も得意なもの」に特化し、B国は「マシなもの」に特化して交換すれば、両国とも豊かになれる。自由貿易の数学的根拠。',
+                    connection: 'スミスの後継者。',
+                    diagramType: 'comparative_advantage',
+                    diagramContent: { countryA: 'ワインに特化', countryB: '布に特化', result: 'Win-Win' }
+                },
+                {
+                    id: 'malthus',
+                    name: 'トマス・マルサス',
+                    title: '陰鬱な科学者',
+                    question: '人類は豊かになり続けられるか？',
+                    answer: '無理だ。人口は幾何級数的に増えるが、食料は算術級数的にしか増えない。',
+                    detail: '『人口論』。貧困は社会制度のせいではなく自然の法則であるとした。人口過剰は貧困や飢餓によって強制的に調整されるというペシミスティックな予測を行った。ダーウィンに影響を与えた。',
+                    connection: '古典派の悲観的側面。',
+                    diagramType: 'malthus_curve',
+                    diagramContent: null
+                }
+            ],
+            neoclassical: [
+                {
+                    id: 'walras',
+                    name: 'レオン・ワルラス',
+                    title: '一般均衡の父',
+                    question: '市場の価格はどうやって決まるのか？',
+                    answer: 'すべての市場の需要と供給が一致する「均衡点」が存在する。',
+                    detail: '経済学を物理学のような数学的モデル（一般均衡理論）にした。競売人（オークショニア）が価格を叫び、需給が一致するまで調整されるモデルを構想。',
+                    connection: 'ローザンヌ学派。限界革命の一翼。',
+                    diagramType: 'equilibrium',
+                    diagramContent: null
+                },
+                {
+                    id: 'marshall',
+                    name: 'アルフレッド・マーシャル',
+                    title: '新古典派の大家',
+                    question: '価格を決めるのは「コスト」か「欲しさ」か？',
+                    answer: '両方だ。ハサミの2枚の刃のように、供給（コスト）と需要（効用）で決まる。',
+                    detail: '古典派（コスト説）と限界効用派（需要説）を統合し、現代のミクロ経済学の基礎である「需要供給曲線（X型のグラフ）」を定着させた。',
+                    connection: 'ケンブリッジ学派の始祖。ケインズの師。',
+                    diagramType: 'supply_demand',
+                    diagramContent: null
+                }
+            ],
+            marxist: [
+                {
+                    id: 'marx',
+                    name: 'カール・マルクス',
+                    title: '資本論',
+                    question: 'なぜ資本家は儲かり、労働者は貧しいままなのか？',
+                    answer: '労働者が生んだ価値の一部（剰余価値）を、資本家が搾取しているからだ。',
+                    detail: '労働価値説に基づき、利益の源泉は「不払い労働」にあると説いた。資本主義は必然的に恐慌を繰り返し、格差が拡大し、最終的に革命によって崩壊すると科学的に分析した。',
+                    connection: 'リカード労働価値説の批判的継承。',
+                    diagramType: 'surplus_value',
+                    diagramContent: { total: '全価値', wage: '賃金', surplus: '搾取(利益)' }
+                }
+            ],
+            keynesian: [
+                {
+                    id: 'keynes',
+                    name: 'J.M. ケインズ',
+                    title: 'マクロ経済学の父',
+                    question: '不況の時、放っておけば市場は回復するか？',
+                    answer: '回復しない。「長期的には我々はみな死んでいる」。政府が介入すべきだ。',
+                    detail: '『一般理論』。不況の原因は「需要不足（有効需要）」にあるとし、政府が公共事業などで無理やり需要を作り出すことで雇用を守るべきだと説いた。修正資本主義への転換。',
+                    connection: '世界恐慌への処方箋。',
+                    diagramType: 'public_spending',
+                    diagramContent: null
+                }
+            ],
+            libertarian: [
+                {
+                    id: 'friedman',
+                    name: 'ミルトン・フリードマン',
+                    title: '市場の自由の守護者',
+                    question: '政府の介入は経済を良くするか？',
+                    answer: '否。政府は無能だ。通貨供給量（マネー）だけ管理して、あとは市場に任せろ。',
+                    detail: 'ケインズ政策を批判（スタグフレーションを予言）。「小さな政府」と「自由市場」を掲げ、規制緩和や民営化を推進した。マネタリズムの主導者。',
+                    connection: 'シカゴ学派。レーガン・サッチャー改革に影響。',
+                    diagramType: 'small_gov',
+                    diagramContent: null
+                },
+                {
+                    id: 'hayek',
+                    name: 'F.A. ハイエク',
+                    title: '自生的秩序',
+                    question: '社会主義（計画経済）はなぜ失敗するのか？',
+                    answer: '「知識」は分散しており、中央政府がすべてを知ることは不可能だからだ。',
+                    detail: '市場価格は、無数の人々の知識と情報を凝縮した通信システムである。これを人為的に操作しようとする計画経済は「致命的な思い上がり」であり、独裁への道（隷属への道）であると警告した。',
+                    connection: 'オーストリア学派。フリードマンと並ぶ自由主義の巨頭。',
+                    diagramType: 'dispersed_knowledge',
+                    diagramContent: null
+                }
+            ],
+            game: [
+                {
+                    id: 'nash',
+                    name: 'ジョン・ナッシュ',
+                    title: 'ゲーム理論の天才',
+                    question: '全員が自分の利益を追求した時、最適な結果になるか？',
+                    answer: '必ずしもならない（囚人のジレンマ）。だが「均衡点」はある。',
+                    detail: 'スミスの「見えざる手（個人の利益＝全体の利益）」が成立しない状況を数理的に証明。互いに相手の出方を読み合った結果、誰も戦略を変えようとしない膠着状態（ナッシュ均衡）を示した。',
+                    connection: '映画『ビューティフル・マインド』のモデル。',
+                    diagramType: 'nash_equilibrium',
+                    diagramContent: { p1: '自白', p2: '自白', result: '共に服役 (均衡)' }
+                }
+            ],
+            behavioral: [
+                {
+                    id: 'kahneman',
+                    name: 'ダニエル・カーネマン',
+                    title: '行動経済学の創始者',
+                    question: '人間は常に合理的な判断をするか？',
+                    answer: 'しない。人間は感情やバイアスで動く「限定合理的」な存在だ。',
+                    detail: '心理学を経済学に導入。「プロスペクト理論」では、人間は利益の喜びより損失の痛みを大きく感じること（損失回避）を証明し、ホモ・エコノミクス（合理的経済人）の神話を崩した。',
+                    connection: '心理学者として初のノーベル経済学賞。',
+                    diagramType: 'prospect_curve',
+                    diagramContent: null
+                },
+                {
+                    id: 'sen',
+                    name: 'アマルティア・セン',
+                    title: '経済学の良心',
+                    question: '「貧困」とは単にお金がないことか？',
+                    answer: '違う。それは「ケイパビリティ（できること）」の欠如である。',
+                    detail: 'GDPの増大よりも、人々が健康で教育を受け、自由に生きられるか（潜在能力）を重視すべきだとした。HDI（人間開発指数）の基礎を作った。',
+                    connection: '厚生経済学。アジア初ノーベル経済学賞。',
+                    diagramType: 'capability',
+                    diagramContent: null
+                },
+                {
+                    id: 'piketty',
+                    name: 'トマ・ピケティ',
+                    title: '21世紀の資本論',
+                    question: '資本主義において、格差は自然に解消されるか？',
+                    answer: '解消されない。「r > g」である限り、金持ちはより金持ちになる。',
+                    detail: '膨大なデータを分析し、資本収益率（r）は経済成長率（g）よりも常に高いことを証明。つまり、汗水たらして働くより、資産運用のほうが儲かるため、放置すれば格差は無限に拡大すると警告した。',
+                    connection: '現代のマルクスとも呼ばれる。',
+                    diagramType: 'r_g_inequality',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ============================================================================
+        // STATE
+        // ============================================================================
+        
+        let selectedEra = 'classical';
+        let selectedEconomist = null;
+        
+        // ============================================================================
+        // DIAGRAM BUILDER
+        // ============================================================================
+        
+        function buildDiagram(type, content) {
+            const container = document.createElement('div');
+            container.className = 'diagram-container';
+            
+            switch (type) {
+                case 'invisible_hand':
+                    container.innerHTML = `
+                        <div class="diagram-invisible-hand">
+                            <div class="hand">🤚</div>
+                            <div class="flow">
+                                <div class="box">個人の利己心</div>
+                                <div class="arrow">→</div>
+                                <div class="box">社会の繁栄</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'comparative_advantage':
+                    container.innerHTML = `
+                        <div class="diagram-comparative-advantage">
+                            <div class="country country-a">${content.countryA}</div>
+                            <div class="country country-b">${content.countryB}</div>
+                            <div class="result">${content.result}</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'malthus_curve':
+                    container.innerHTML = `
+                        <div class="diagram-malthus-curve">
+                            <div>
+                                <div class="line population"></div>
+                                <div class="label">人口（幾何級数）</div>
+                            </div>
+                            <div>
+                                <div class="line food"></div>
+                                <div class="label">食料（算術級数）</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'equilibrium':
+                    container.innerHTML = `
+                        <div class="diagram-equilibrium">
+                            <div class="line supply"></div>
+                            <div class="line demand"></div>
+                            <div class="point"></div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'supply_demand':
+                    container.innerHTML = `
+                        <div class="diagram-supply-demand">
+                            <div class="scissors">✂️</div>
+                            <div class="blades">
+                                <div class="blade supply">供給（コスト）</div>
+                                <div class="blade demand">需要（効用）</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'surplus_value':
+                    container.innerHTML = `
+                        <div class="diagram-surplus-value">
+                            <div class="bar">
+                                <div class="wage">賃金</div>
+                                <div class="surplus">剰余価値</div>
+                            </div>
+                            <div class="label">労働者の生産価値</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'public_spending':
+                    container.innerHTML = `
+                        <div class="diagram-public-spending">
+                            <div class="gov">🏛️</div>
+                            <div class="arrows">
+                                <div class="arrow">↓</div>
+                                <div class="arrow">↓</div>
+                            </div>
+                            <div class="boxes">
+                                <div class="box">公共事業</div>
+                                <div class="box">雇用創出</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'small_gov':
+                    container.innerHTML = `
+                        <div class="diagram-small-gov">
+                            <div class="comparison">
+                                <div class="gov-big">🏛️</div>
+                                <div class="vs">❌</div>
+                            </div>
+                            <div class="comparison">
+                                <div class="gov-small">🏛️</div>
+                                <div class="vs">✅</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'dispersed_knowledge':
+                    container.innerHTML = `
+                        <div class="diagram-dispersed-knowledge">
+                            <div class="center">🏛️</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'nash_equilibrium':
+                    container.innerHTML = `
+                        <div class="diagram-nash-equilibrium">
+                            <div class="table">
+                                <div class="cell header"></div>
+                                <div class="cell header">黙秘</div>
+                                <div class="cell header">自白</div>
+                                <div class="cell header">黙秘</div>
+                                <div class="cell">両者-1年</div>
+                                <div class="cell">A:-10年 B:釈放</div>
+                                <div class="cell header">自白</div>
+                                <div class="cell">A:釈放 B:-10年</div>
+                                <div class="cell equilibrium">両者-5年<br/>（均衡）</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'prospect_curve':
+                    container.innerHTML = `
+                        <div class="diagram-prospect-curve">
+                            <div class="curve">
+                                <div class="gain">+利益</div>
+                                <div class="loss">-損失<br/>(強く感じる)</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'capability':
+                    container.innerHTML = `
+                        <div class="diagram-capability">
+                            <div class="item gdp">GDP: お金があるか</div>
+                            <div class="item cap">ケイパビリティ:<br/>健康・教育・自由があるか</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'r_g_inequality':
+                    container.innerHTML = `
+                        <div class="diagram-r-g-inequality">
+                            <div class="formula">r > g</div>
+                            <div class="explanation">
+                                <div class="box r">r<br/>資本収益率</div>
+                                <div class="box g">g<br/>経済成長率</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    container.innerHTML = '<div style="color: #9ca3af;">図解準備中</div>';
+            }
+            
+            return container;
+        }
+        
+        // ============================================================================
+        // RENDER FUNCTIONS
+        // ============================================================================
+        
+        function renderEras() {
+            const sidebar = document.getElementById('eraSidebar');
+            sidebar.innerHTML = '';
+            
+            ERAS.forEach(era => {
+                const item = document.createElement('div');
+                item.className = 'era-item' + (era.id === selectedEra ? ' active' : '');
+                item.onclick = () => selectEra(era.id);
+                
+                item.innerHTML = `
+                    <div class="era-icon">${era.icon}</div>
+                    <div class="era-info">
+                        <div class="era-title">${era.title}</div>
+                        <div class="era-period">${era.period}</div>
+                    </div>
+                `;
+                
+                sidebar.appendChild(item);
+            });
+        }
+        
+        function renderEconomists() {
+            const grid = document.getElementById('economistGrid');
+            const economists = ECONOMISTS[selectedEra] || [];
+            
+            grid.innerHTML = '<div class="grid-container"></div>';
+            const container = grid.querySelector('.grid-container');
+            
+            economists.forEach(economist => {
+                const card = document.createElement('div');
+                card.className = 'economist-card' + (selectedEconomist && selectedEconomist.id === economist.id ? ' selected' : '');
+                card.onclick = () => selectEconomist(economist);
+                
+                card.innerHTML = `
+                    <div class="economist-name">${economist.name}</div>
+                    <div class="economist-title">${economist.title}</div>
+                    <div class="economist-question">${economist.question}</div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function renderDetail() {
+            const area = document.getElementById('detailArea');
+            area.innerHTML = '';
+            
+            if (!selectedEconomist) {
+                area.innerHTML = '<div class="empty-state">経済学者を選択してください</div>';
+                return;
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'detail-card';
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'detail-header';
+            header.innerHTML = `
+                <div class="detail-name">${selectedEconomist.name}</div>
+                <div class="detail-title">${selectedEconomist.title}</div>
+            `;
+            card.appendChild(header);
+            
+            // Question
+            const question = document.createElement('div');
+            question.className = 'detail-section';
+            question.innerHTML = `
+                <h3 class="question">❓ 問い</h3>
+                <p>${selectedEconomist.question}</p>
+            `;
+            card.appendChild(question);
+            
+            // Answer
+            const answer = document.createElement('div');
+            answer.className = 'detail-section';
+            answer.innerHTML = `
+                <h3 class="answer">💡 答え</h3>
+                <p class="answer-text">${selectedEconomist.answer}</p>
+            `;
+            card.appendChild(answer);
+            
+            // Detail
+            const detail = document.createElement('div');
+            detail.className = 'detail-section';
+            detail.innerHTML = `
+                <h3 class="detail">📖 詳細</h3>
+                <p class="detail-text">${selectedEconomist.detail}</p>
+            `;
+            card.appendChild(detail);
+            
+            // Connection
+            const connection = document.createElement('div');
+            connection.className = 'detail-section';
+            connection.innerHTML = `
+                <h3 class="connection">🔗 系譜</h3>
+                <p class="connection-text">${selectedEconomist.connection}</p>
+            `;
+            card.appendChild(connection);
+            
+            // Diagram
+            const diagramSection = document.createElement('div');
+            diagramSection.className = 'detail-section';
+            const diagramHeader = document.createElement('h3');
+            diagramHeader.className = 'diagram';
+            diagramHeader.textContent = '📊 図解';
+            diagramSection.appendChild(diagramHeader);
+            
+            const diagram = buildDiagram(selectedEconomist.diagramType, selectedEconomist.diagramContent);
+            diagramSection.appendChild(diagram);
+            card.appendChild(diagramSection);
+            
+            area.appendChild(card);
+            area.scrollTop = 0;
+        }
+        
+        // ============================================================================
+        // EVENT HANDLERS
+        // ============================================================================
+        
+        function selectEra(eraId) {
+            selectedEra = eraId;
+            const economists = ECONOMISTS[selectedEra] || [];
+            selectedEconomist = economists.length > 0 ? economists[0] : null;
+            
+            renderEras();
+            renderEconomists();
+            renderDetail();
+        }
+        
+        function selectEconomist(economist) {
+            selectedEconomist = economist;
+            renderEconomists();
+            renderDetail();
+        }
+        
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const economists = ECONOMISTS[selectedEra] || [];
+            selectedEconomist = economists.length > 0 ? economists[0] : null;
+            
+            renderEras();
+            renderEconomists();
+            renderDetail();
+        });
+    </script>
+</body>
+</html>

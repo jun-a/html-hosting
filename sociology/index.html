@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社会学図鑑 - Sociology Illustrated Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #1f2937;
+            background-color: #111827;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: #9ca3af;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Left sidebar - Eras */
+        .era-sidebar {
+            width: 16rem;
+            background-color: #111827;
+            border-right: 1px solid #1f2937;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .era-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: #1f2937;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .era-item:hover {
+            background-color: #374151;
+        }
+        
+        .era-item.active {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .era-icon {
+            font-size: 1.125rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        
+        .era-info {
+            flex: 1;
+        }
+        
+        .era-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+        
+        .era-period {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        
+        /* Center - Sociologist cards */
+        .sociologist-grid {
+            flex: 1;
+            background-color: #0f172a;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .sociologist-card {
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sociologist-card:hover {
+            border-color: #60a5fa;
+            box-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
+            transform: translateY(-4px);
+        }
+        
+        .sociologist-card.selected {
+            border-color: #3b82f6;
+            background-color: #1e3a8a;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+        
+        .sociologist-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sociologist-title {
+            font-size: 0.875rem;
+            color: #a78bfa;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sociologist-question {
+            font-size: 0.875rem;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+        
+        /* Right side - Detail view */
+        .detail-area {
+            width: 40rem;
+            background-color: #111827;
+            border-left: 1px solid #1f2937;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            font-size: 1.125rem;
+        }
+        
+        .detail-card {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .detail-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #1f2937;
+        }
+        
+        .detail-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-title {
+            font-size: 1.125rem;
+            color: #a78bfa;
+        }
+        
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+        
+        .detail-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .detail-section p {
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+        
+        .question {
+            color: #fbbf24;
+        }
+        
+        .answer {
+            color: #34d399;
+        }
+        
+        .answer-text {
+            background-color: #064e3b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #10b981;
+        }
+        
+        .detail {
+            color: #60a5fa;
+        }
+        
+        .detail-text {
+            background-color: #1e3a8a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .connection {
+            color: #f472b6;
+        }
+        
+        .connection-text {
+            background-color: #831843;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .diagram {
+            color: #a78bfa;
+        }
+        
+        .diagram-container {
+            background-color: #1f2937;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-top: 0.75rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* Diagram Styles */
+        .diagram-three-stages {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .diagram-three-stages .stage {
+            flex: 1;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background-color: #1e3a8a;
+            border-radius: 0.5rem;
+            border: 2px solid #3b82f6;
+        }
+        
+        .diagram-three-stages .stage:nth-child(2) {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-three-stages .stage:nth-child(3) {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-three-stages .arrow {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-evolution {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .diagram-evolution .box {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .diagram-evolution .from {
+            background-color: #7c2d12;
+            border: 2px solid #ea580c;
+        }
+        
+        .diagram-evolution .to {
+            background-color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        .diagram-evolution .arrow {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .diagram-pyramid .layer {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .diagram-pyramid .top {
+            background-color: #7c2d12;
+            border: 2px solid #ea580c;
+            width: 200px;
+        }
+        
+        .diagram-pyramid .bottom {
+            background-color: #1e3a8a;
+            border: 2px solid #3b82f6;
+            width: 300px;
+        }
+        
+        .diagram-pyramid .vs {
+            font-size: 2rem;
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .diagram-suicide-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .diagram-suicide-types .type {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-suicide-types .type:nth-child(1) {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-suicide-types .type:nth-child(2) {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-suicide-types .type:nth-child(3) {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-suicide-types .type:nth-child(4) {
+            background-color: #4c1d95;
+            border-color: #a78bfa;
+        }
+        
+        .diagram-iron-cage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-iron-cage .cage {
+            width: 200px;
+            height: 200px;
+            border: 4px solid #ef4444;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .diagram-iron-cage .bars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 10px;
+        }
+        
+        .diagram-iron-cage .bar {
+            width: 4px;
+            background-color: #ef4444;
+            opacity: 0.6;
+        }
+        
+        .diagram-iron-cage .person {
+            font-size: 3rem;
+            z-index: 10;
+        }
+        
+        .diagram-iron-cage .label {
+            color: #9ca3af;
+            text-align: center;
+        }
+        
+        .diagram-interaction-web {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 250px;
+        }
+        
+        .diagram-interaction-web .node {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #1e3a8a;
+            border: 2px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            font-size: 1.5rem;
+        }
+        
+        .diagram-interaction-web .node:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .diagram-interaction-web .node:nth-child(2) { top: 20%; left: 30%; }
+        .diagram-interaction-web .node:nth-child(3) { top: 20%; right: 30%; }
+        .diagram-interaction-web .node:nth-child(4) { bottom: 20%; left: 30%; }
+        .diagram-interaction-web .node:nth-child(5) { bottom: 20%; right: 30%; }
+        
+        .diagram-agil {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .diagram-agil .quadrant {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-agil .a {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-agil .g {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-agil .i {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-agil .l {
+            background-color: #4c1d95;
+            border-color: #a78bfa;
+        }
+        
+        .diagram-agil .label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .diagram-latent-function {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .diagram-latent-function .function {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid;
+        }
+        
+        .diagram-latent-function .manifest {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-latent-function .latent {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-culture-industry {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-culture-industry .factory {
+            width: 200px;
+            height: 150px;
+            background-color: #7c2d12;
+            border: 3px solid #ea580c;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .diagram-culture-industry .arrows {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .diagram-culture-industry .arrow {
+            font-size: 2rem;
+            color: #ef4444;
+        }
+        
+        .diagram-culture-industry .products {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .diagram-culture-industry .product {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #4b5563;
+            border: 2px solid #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .diagram-system-lifeworld {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .diagram-system-lifeworld .box {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            min-width: 150px;
+            border: 2px solid;
+        }
+        
+        .diagram-system-lifeworld .system {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-system-lifeworld .lifeworld {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-system-lifeworld .arrow {
+            font-size: 2rem;
+            color: #ef4444;
+        }
+        
+        .diagram-mirror-self {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-mirror-self .circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .diagram-mirror-self .others {
+            background-color: #7c2d12;
+            border: 3px solid #ea580c;
+        }
+        
+        .diagram-mirror-self .arrow {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-mirror-self .self {
+            background-color: #1e3a8a;
+            border: 3px solid #3b82f6;
+        }
+        
+        .diagram-theater {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .diagram-theater .stage {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-theater .front {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-theater .back {
+            background-color: #4b5563;
+            border-color: #9ca3af;
+        }
+        
+        .diagram-cultural-capital {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-cultural-capital .layer {
+            padding: 1.5rem 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-cultural-capital .parents {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+            width: 300px;
+        }
+        
+        .diagram-cultural-capital .arrow {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+        
+        .diagram-cultural-capital .children {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+            width: 300px;
+        }
+        
+        .diagram-panopticon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .diagram-panopticon .tower {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #7c2d12;
+            border: 3px solid #ea580c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .diagram-panopticon .cells {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .diagram-panopticon .cell {
+            width: 60px;
+            height: 80px;
+            background-color: #4b5563;
+            border: 2px solid #9ca3af;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .diagram-simulacra {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .diagram-simulacra .level {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            width: 280px;
+            border: 2px solid;
+        }
+        
+        .diagram-simulacra .level:nth-child(1) {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-simulacra .level:nth-child(2) {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-simulacra .level:nth-child(3) {
+            background-color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .diagram-simulacra .level:nth-child(4) {
+            background-color: #4c1d95;
+            border-color: #a78bfa;
+        }
+        
+        .diagram-structuration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .diagram-structuration .element {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 2px solid;
+        }
+        
+        .diagram-structuration .structure {
+            background-color: #7c2d12;
+            border-color: #ea580c;
+        }
+        
+        .diagram-structuration .agency {
+            background-color: #1e3a8a;
+            border-color: #3b82f6;
+        }
+        
+        .diagram-structuration .bidirectional {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 社会学図鑑 - Sociology Encyclopedia</h1>
+            <p>社会の発見から現代まで：社会学者たちの系譜</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left sidebar: Eras -->
+            <div class="era-sidebar" id="eraSidebar"></div>
+            
+            <!-- Center: Sociologist grid -->
+            <div class="sociologist-grid" id="sociologistGrid"></div>
+            
+            <!-- Right: Detail view -->
+            <div class="detail-area" id="detailArea">
+                <div class="empty-state">
+                    社会学者を選択してください
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================================================
+        // DATA STRUCTURE
+        // ============================================================================
+        
+        const ERAS = [
+            { id: 'founders', title: '創始期：社会の発見', period: '1800 - 1890', icon: '🌍' },
+            { id: 'classical', title: '古典期：三大巨匠', period: '1890 - 1920', icon: '📦' },
+            { id: 'american', title: '米国期：機能と構造', period: '1920 - 1960', icon: '📊' },
+            { id: 'critical', title: '批判理論：フランクフルト', period: '1930 - 1970', icon: '⚡' },
+            { id: 'interaction', title: '微視的：相互作用論', period: '1950 - 1980', icon: '💬' },
+            { id: 'contemporary', title: '現代：構造と主体', period: '1970 - Present', icon: '📐' }
+        ];
+        
+        const SOCIOLOGISTS = {
+            founders: [
+                {
+                    id: 'comte',
+                    name: 'オーギュスト・コント',
+                    title: '社会学の父',
+                    question: '社会を「科学」として研究できるか？',
+                    answer: 'できる。神学→形而上学→実証的段階へと進歩する「社会物理学」だ。',
+                    detail: '「社会学（Sociologie）」という言葉を作った人物。人間の知識や社会の発展は3つの段階（三段階の法則）を経ると説き、観察と実験に基づく実証主義を提唱した。',
+                    connection: '師はサン＝シモン。J.S.ミルに影響。',
+                    diagramType: 'three_stages',
+                    diagramContent: { one: '神学的段階', two: '形而上学的段階', three: '実証的段階' }
+                },
+                {
+                    id: 'spencer',
+                    name: 'ハーバート・スペンサー',
+                    title: '社会ダーウィニズムの祖',
+                    question: '社会はどのように発展するのか？',
+                    answer: '生物と同じように「進化」する。適者生存が原則だ。',
+                    detail: 'ダーウィンの進化論を社会に適用。社会は単純な軍事型から、複雑な産業型へと進化するとした。「自由放任（レッセ・フェール）」を支持し、福祉による弱者救済は進化を妨げると主張したため、後に批判された。',
+                    connection: '進化論的アプローチの確立。',
+                    diagramType: 'evolution',
+                    diagramContent: { from: '軍事型社会 (強制)', to: '産業型社会 (自由契約)' }
+                },
+                {
+                    id: 'marx',
+                    name: 'カール・マルクス',
+                    title: '闘争の社会学者',
+                    question: '社会の真の姿は何で決まるか？',
+                    answer: '「下部構造（経済）」がすべてを決める。歴史は階級闘争だ。',
+                    detail: '社会学の巨匠の一人だが、本人は経済学者・革命家。社会を「資本家（ブルジョワ）」と「労働者（プロレタリアート）」の対立構造として捉え、資本主義はいずれ崩壊して共産主義へ移行すると予言した。',
+                    connection: 'ウェーバーらとの対比で重要。',
+                    diagramType: 'pyramid_struggle',
+                    diagramContent: null
+                }
+            ],
+            classical: [
+                {
+                    id: 'durkheim',
+                    name: 'エミール・デュルケーム',
+                    title: '社会学の擁護者',
+                    question: '自殺のような個人的行為に、社会的な原因はあるか？',
+                    answer: 'ある。自殺は「社会的事実」であり、結束力の弱さが原因だ。',
+                    detail: '社会学を心理学から独立させた。「社会的事実（個人の外にあって個人を拘束するもの）」を研究対象とした。『自殺論』では、アノミー（無規範）的自殺や自己本位的自殺など、社会統合の度合いで自殺を分類した。',
+                    connection: 'フランス社会学派の祖。',
+                    diagramType: 'suicide_types',
+                    diagramContent: null
+                },
+                {
+                    id: 'weber',
+                    name: 'マックス・ウェーバー',
+                    title: '理解社会学の巨匠',
+                    question: 'なぜ西洋だけで合理的な資本主義が生まれたのか？',
+                    answer: 'プロテスタントの「禁欲」の精神が、逆説的に金儲けを肯定したからだ。',
+                    detail: '個人の主観的な意味（動機）を理解しようとした。近代化を「合理化（脱魔術化）」の過程として捉え、その行き着く先として「官僚制」や、人間を縛る「鉄の檻」を予見した。支配の三類型（伝統的・カリスマ的・合法的）も有名。',
+                    connection: 'マルクスの唯物論に対し、精神（宗教）の力を重視。',
+                    diagramType: 'iron_cage',
+                    diagramContent: null
+                },
+                {
+                    id: 'simmel',
+                    name: 'ゲオルク・ジンメル',
+                    title: '形式社会学の祖',
+                    question: '社会とは実体なのか？',
+                    answer: 'いいえ、社会とは個人間の「相互作用の形式」である。',
+                    detail: '「社会」という巨大な生き物はいない。あるのは人々の関係性（相互作用）だけだ。「よそ者」「二人組と三人組」「貨幣の哲学」など、微細な人間関係のパターン（形式）を分析した。',
+                    connection: 'シカゴ学派や相互作用論に影響。',
+                    diagramType: 'interaction_web',
+                    diagramContent: null
+                }
+            ],
+            american: [
+                {
+                    id: 'parsons',
+                    name: 'タルコット・パーソンズ',
+                    title: '構造機能主義の帝王',
+                    question: 'なぜ社会はバラバラにならず、秩序を保てるのか？',
+                    answer: '社会システムには、生存に必要な4つの機能（AGIL）が備わっているからだ。',
+                    detail: '20世紀半ばのアメリカ社会学を支配した。社会を一つの巨大なシステムと見なし、経済・政治・法・文化がそれぞれ役割（機能）を果たして均衡を保っていると説いた（AGIL図式）。',
+                    connection: 'ウェーバーやデュルケームを統合。',
+                    diagramType: 'agil',
+                    diagramContent: { A: '適応(経済)', G: '目標達成(政治)', I: '統合(法・慣習)', L: '潜在的維持(教育・文化)' }
+                },
+                {
+                    id: 'merton',
+                    name: 'ロバート・K・マートン',
+                    title: '中範囲の理論家',
+                    question: '良い意図で行った政策が、悪い結果を生むのはなぜか？',
+                    answer: '社会現象には「予期せざる結果」や「潜在的機能」があるからだ。',
+                    detail: 'パーソンズの壮大すぎる理論を修正。物事には目に見える「顕在的機能」と、隠れた「潜在的機能」があるとした。「予言の自己成就」や、成功への道が閉ざされた時に犯罪が起きる「アノミー理論」で有名。',
+                    connection: 'パーソンズの弟子だが批判的継承。',
+                    diagramType: 'latent_function',
+                    diagramContent: { manifest: '雨乞い→雨を願う', latent: '雨乞い→集団の結束を高める' }
+                }
+            ],
+            critical: [
+                {
+                    id: 'adorno',
+                    name: 'アドルノ & ホルクハイマー',
+                    title: 'フランクフルト学派',
+                    question: '理性が発達した近代が、なぜナチスのような野蛮を生んだのか？',
+                    answer: '理性が「道具」になり下がり、自然や人間を支配する凶器になったからだ。',
+                    detail: '『啓蒙の弁証法』。理性を批判的に検討。大衆文化（映画やジャズ）を「文化産業」と呼び、人々を思考停止させ、体制に従順な「ロボット」にする装置だと激しく批判した。',
+                    connection: 'マルクス主義と精神分析を統合。',
+                    diagramType: 'culture_industry',
+                    diagramContent: null
+                },
+                {
+                    id: 'habermas',
+                    name: 'ユルゲン・ハーバーマス',
+                    title: '討議倫理の哲学者',
+                    question: '金と権力に支配された社会をどう修復するか？',
+                    answer: '「対話（コミュニケーション的行為）」による合意形成を取り戻せ。',
+                    detail: 'フランクフルト学派第二世代。「システム（市場・行政）」が「生活世界（日常の対話）」を侵食していると警告（生活世界の植民地化）。対等な対話の場（公共圏）の再生を説いた。',
+                    connection: '現代ドイツの最高峰。',
+                    diagramType: 'system_lifeworld',
+                    diagramContent: { system: '金・権力 (システム)', lifeworld: '対話・合意 (生活世界)', action: '侵食' }
+                }
+            ],
+            interaction: [
+                {
+                    id: 'mead',
+                    name: 'G.H. ミード',
+                    title: '社会心理学の創始者',
+                    question: '「私（自我）」はどうやって生まれるのか？',
+                    answer: '他者の視点を取り入れること（役割取得）によって生まれる。',
+                    detail: '最初から「私」がいるのではない。ごっこ遊びやゲームを通じて、「一般化された他者（みんな）」の視点を自分の中に取り込むことで、客観的な「私（Me）」が形成される。',
+                    connection: 'シンボリック相互作用論の源流。',
+                    diagramType: 'mirror_self',
+                    diagramContent: null
+                },
+                {
+                    id: 'goffman',
+                    name: 'アーヴィング・ゴフマン',
+                    title: 'ドラマトゥルギー',
+                    question: '私たちは日常で何をしているのか？',
+                    answer: '誰もが舞台の上で「演技」をしている俳優である。',
+                    detail: '社会生活を「演劇」になぞらえた。人は「表舞台」で理想の自分を演じ（印象操作）、「舞台裏」で素に戻る。精神病院の研究（『アサイラム』）では、施設が人のアイデンティティを剥奪する様を描いた。',
+                    connection: 'ミクロ社会学の天才。',
+                    diagramType: 'theater',
+                    diagramContent: { front: '表舞台 (演技)', back: '舞台裏 (本音)' }
+                }
+            ],
+            contemporary: [
+                {
+                    id: 'bourdieu',
+                    name: 'ピエール・ブルデュー',
+                    title: '文化資本の社会学者',
+                    question: 'なぜ格差は再生産されるのか？',
+                    answer: '親から子へ、金だけでなく「趣味・センス（文化資本）」が継承されるからだ。',
+                    detail: '「学校」は公平に見えて、実は上流階級の文化（ハビトゥス）を持つ子に有利なルールで動いている。クラシック音楽を好むか演歌を好むかといった「趣味（ディスタンクシオン）」こそが、階級を分ける武器になる。',
+                    connection: '構造と主体を統合。',
+                    diagramType: 'cultural_capital',
+                    diagramContent: null
+                },
+                {
+                    id: 'foucault',
+                    name: 'ミシェル・フーコー',
+                    title: '権力の解剖学者',
+                    question: '権力はどこにあるのか？',
+                    answer: '王様の命令ではなく、学校や病院の「規律」として日常に埋め込まれている。',
+                    detail: '「パノプティコン（一望監視施設）」のモデルを用い、近代社会は人々が自発的に規律を守るように訓練される「監獄」であると説いた。知（学問）と権力は一体である。',
+                    connection: 'ポスト構造主義。',
+                    diagramType: 'panopticon',
+                    diagramContent: null
+                },
+                {
+                    id: 'baudrillard',
+                    name: 'ジャン・ボードリヤール',
+                    title: 'シミュラークルの予言者',
+                    question: '消費社会で、私たちは何を買っているのか？',
+                    answer: 'モノの機能ではなく、「記号（ブランド・イメージ）」を買っている。',
+                    detail: '現代はオリジナルなきコピー（シミュラークル）が現実よりもリアルになった「ハイパーリアル」の世界。ディズニーランドこそがリアルで、外の世界が虚構になりつつある。マトリックスの元ネタ。',
+                    connection: 'ポストモダン社会学。',
+                    diagramType: 'simulacra',
+                    diagramContent: null
+                },
+                {
+                    id: 'giddens',
+                    name: 'アンソニー・ギデンズ',
+                    title: '第三の道',
+                    question: '伝統が消えた世界で、私たちはどう生きるか？',
+                    answer: '常に情報を反省し、自分の人生を再構築し続ける（再帰的近代化）。',
+                    detail: '構造化理論：社会構造は人間を縛るが、人間もまた構造を作り変えることができる。現代は「伝統」のガイドラインがないため、恋愛も仕事も自分で選び続けなければならない（自己のアイデンティティ計画）。',
+                    connection: 'ブレア政権のブレーン。',
+                    diagramType: 'structuration',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ============================================================================
+        // STATE
+        // ============================================================================
+        
+        let selectedEra = 'founders';
+        let selectedSociologist = null;
+        
+        // ============================================================================
+        // DIAGRAM BUILDER
+        // ============================================================================
+        
+        function buildDiagram(type, content) {
+            const container = document.createElement('div');
+            container.className = 'diagram-container';
+            
+            switch (type) {
+                case 'three_stages':
+                    container.innerHTML = `
+                        <div class="diagram-three-stages">
+                            <div class="stage">${content.one}</div>
+                            <div class="arrow">→</div>
+                            <div class="stage">${content.two}</div>
+                            <div class="arrow">→</div>
+                            <div class="stage">${content.three}</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'evolution':
+                    container.innerHTML = `
+                        <div class="diagram-evolution">
+                            <div class="box from">${content.from}</div>
+                            <div class="arrow">→</div>
+                            <div class="box to">${content.to}</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'pyramid_struggle':
+                    container.innerHTML = `
+                        <div class="diagram-pyramid">
+                            <div class="layer top">資本家<br/>（ブルジョワ）</div>
+                            <div class="vs">⚔️</div>
+                            <div class="layer bottom">労働者<br/>（プロレタリアート）</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'suicide_types':
+                    container.innerHTML = `
+                        <div class="diagram-suicide-types">
+                            <div class="type">自己本位的<br/>自殺</div>
+                            <div class="type">集団本位的<br/>自殺</div>
+                            <div class="type">アノミー的<br/>自殺</div>
+                            <div class="type">宿命的<br/>自殺</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'iron_cage':
+                    container.innerHTML = `
+                        <div class="diagram-iron-cage">
+                            <div class="cage">
+                                <div class="bars">
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                </div>
+                                <div class="person">🧑</div>
+                            </div>
+                            <div class="label">官僚制の「鉄の檻」</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'interaction_web':
+                    container.innerHTML = `
+                        <div class="diagram-interaction-web">
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                            <div class="node">👤</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'agil':
+                    container.innerHTML = `
+                        <div class="diagram-agil">
+                            <div class="quadrant a">
+                                <div class="label">A</div>
+                                <div>${content.A}</div>
+                            </div>
+                            <div class="quadrant g">
+                                <div class="label">G</div>
+                                <div>${content.G}</div>
+                            </div>
+                            <div class="quadrant i">
+                                <div class="label">I</div>
+                                <div>${content.I}</div>
+                            </div>
+                            <div class="quadrant l">
+                                <div class="label">L</div>
+                                <div>${content.L}</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'latent_function':
+                    container.innerHTML = `
+                        <div class="diagram-latent-function">
+                            <div class="function manifest">
+                                <strong>顕在的機能：</strong>${content.manifest}
+                            </div>
+                            <div class="function latent">
+                                <strong>潜在的機能：</strong>${content.latent}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'culture_industry':
+                    container.innerHTML = `
+                        <div class="diagram-culture-industry">
+                            <div class="factory">🏭</div>
+                            <div class="arrows">
+                                <div class="arrow">↓</div>
+                                <div class="arrow">↓</div>
+                                <div class="arrow">↓</div>
+                            </div>
+                            <div class="products">
+                                <div class="product">🎬</div>
+                                <div class="product">🎵</div>
+                                <div class="product">📺</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'system_lifeworld':
+                    container.innerHTML = `
+                        <div class="diagram-system-lifeworld">
+                            <div class="box system">${content.system}</div>
+                            <div class="arrow">⚡</div>
+                            <div class="box lifeworld">${content.lifeworld}</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'mirror_self':
+                    container.innerHTML = `
+                        <div class="diagram-mirror-self">
+                            <div class="circle others">👥</div>
+                            <div class="arrow">↓</div>
+                            <div class="circle self">🪞</div>
+                            <div>役割取得</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'theater':
+                    container.innerHTML = `
+                        <div class="diagram-theater">
+                            <div class="stage front">
+                                <div><strong>${content.front}</strong></div>
+                                <div>🎭</div>
+                            </div>
+                            <div class="stage back">
+                                <div><strong>${content.back}</strong></div>
+                                <div>😌</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'cultural_capital':
+                    container.innerHTML = `
+                        <div class="diagram-cultural-capital">
+                            <div class="layer parents">親の文化資本<br/>（趣味・教養）</div>
+                            <div class="arrow">↓</div>
+                            <div class="layer children">子の文化資本<br/>（再生産）</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'panopticon':
+                    container.innerHTML = `
+                        <div class="diagram-panopticon">
+                            <div class="tower">👁️</div>
+                            <div class="cells">
+                                <div class="cell">🧑</div>
+                                <div class="cell">🧑</div>
+                                <div class="cell">🧑</div>
+                                <div class="cell">🧑</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'simulacra':
+                    container.innerHTML = `
+                        <div class="diagram-simulacra">
+                            <div class="level">1. 現実の反映</div>
+                            <div class="level">2. 現実の歪曲</div>
+                            <div class="level">3. 現実の不在</div>
+                            <div class="level">4. 現実との無関係</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'structuration':
+                    container.innerHTML = `
+                        <div class="diagram-structuration">
+                            <div class="element structure">社会構造</div>
+                            <div class="bidirectional">⇄</div>
+                            <div class="element agency">人間の行為</div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    container.innerHTML = '<div style="color: #9ca3af;">図解準備中</div>';
+            }
+            
+            return container;
+        }
+        
+        // ============================================================================
+        // RENDER FUNCTIONS
+        // ============================================================================
+        
+        function renderEras() {
+            const sidebar = document.getElementById('eraSidebar');
+            sidebar.innerHTML = '';
+            
+            ERAS.forEach(era => {
+                const item = document.createElement('div');
+                item.className = 'era-item' + (era.id === selectedEra ? ' active' : '');
+                item.onclick = () => selectEra(era.id);
+                
+                item.innerHTML = `
+                    <div class="era-icon">${era.icon}</div>
+                    <div class="era-info">
+                        <div class="era-title">${era.title}</div>
+                        <div class="era-period">${era.period}</div>
+                    </div>
+                `;
+                
+                sidebar.appendChild(item);
+            });
+        }
+        
+        function renderSociologists() {
+            const grid = document.getElementById('sociologistGrid');
+            const sociologists = SOCIOLOGISTS[selectedEra] || [];
+            
+            grid.innerHTML = '<div class="grid-container"></div>';
+            const container = grid.querySelector('.grid-container');
+            
+            sociologists.forEach(sociologist => {
+                const card = document.createElement('div');
+                card.className = 'sociologist-card' + (selectedSociologist && selectedSociologist.id === sociologist.id ? ' selected' : '');
+                card.onclick = () => selectSociologist(sociologist);
+                
+                card.innerHTML = `
+                    <div class="sociologist-name">${sociologist.name}</div>
+                    <div class="sociologist-title">${sociologist.title}</div>
+                    <div class="sociologist-question">${sociologist.question}</div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function renderDetail() {
+            const area = document.getElementById('detailArea');
+            area.innerHTML = '';
+            
+            if (!selectedSociologist) {
+                area.innerHTML = '<div class="empty-state">社会学者を選択してください</div>';
+                return;
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'detail-card';
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'detail-header';
+            header.innerHTML = `
+                <div class="detail-name">${selectedSociologist.name}</div>
+                <div class="detail-title">${selectedSociologist.title}</div>
+            `;
+            card.appendChild(header);
+            
+            // Question
+            const question = document.createElement('div');
+            question.className = 'detail-section';
+            question.innerHTML = `
+                <h3 class="question">❓ 問い</h3>
+                <p>${selectedSociologist.question}</p>
+            `;
+            card.appendChild(question);
+            
+            // Answer
+            const answer = document.createElement('div');
+            answer.className = 'detail-section';
+            answer.innerHTML = `
+                <h3 class="answer">💡 答え</h3>
+                <p class="answer-text">${selectedSociologist.answer}</p>
+            `;
+            card.appendChild(answer);
+            
+            // Detail
+            const detail = document.createElement('div');
+            detail.className = 'detail-section';
+            detail.innerHTML = `
+                <h3 class="detail">📖 詳細</h3>
+                <p class="detail-text">${selectedSociologist.detail}</p>
+            `;
+            card.appendChild(detail);
+            
+            // Connection
+            const connection = document.createElement('div');
+            connection.className = 'detail-section';
+            connection.innerHTML = `
+                <h3 class="connection">🔗 系譜</h3>
+                <p class="connection-text">${selectedSociologist.connection}</p>
+            `;
+            card.appendChild(connection);
+            
+            // Diagram
+            const diagramSection = document.createElement('div');
+            diagramSection.className = 'detail-section';
+            const diagramHeader = document.createElement('h3');
+            diagramHeader.className = 'diagram';
+            diagramHeader.textContent = '📊 図解';
+            diagramSection.appendChild(diagramHeader);
+            
+            const diagram = buildDiagram(selectedSociologist.diagramType, selectedSociologist.diagramContent);
+            diagramSection.appendChild(diagram);
+            card.appendChild(diagramSection);
+            
+            area.appendChild(card);
+            area.scrollTop = 0;
+        }
+        
+        // ============================================================================
+        // EVENT HANDLERS
+        // ============================================================================
+        
+        function selectEra(eraId) {
+            selectedEra = eraId;
+            const sociologists = SOCIOLOGISTS[selectedEra] || [];
+            selectedSociologist = sociologists.length > 0 ? sociologists[0] : null;
+            
+            renderEras();
+            renderSociologists();
+            renderDetail();
+        }
+        
+        function selectSociologist(sociologist) {
+            selectedSociologist = sociologist;
+            renderSociologists();
+            renderDetail();
+        }
+        
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const sociologists = SOCIOLOGISTS[selectedEra] || [];
+            selectedSociologist = sociologists.length > 0 ? sociologists[0] : null;
+            
+            renderEras();
+            renderSociologists();
+            renderDetail();
+        });
+    </script>
+</body>
+</html>
