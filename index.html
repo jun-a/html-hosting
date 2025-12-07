@@ -57,6 +57,18 @@
             animation: float 3s ease-in-out infinite;
         }
         
+        @media (prefers-reduced-motion: reduce) {
+            .card-hover {
+                transition: none;
+            }
+            .card-hover:hover {
+                transform: none;
+            }
+            .float-animation {
+                animation: none;
+            }
+        }
+        
         .bg-pattern {
             background-color: #0f172a;
             background-image: 
@@ -114,7 +126,7 @@
                         </div>
                         <div class="mt-6 flex items-center justify-center text-purple-400 font-semibold">
                             <span>探索する</span>
-                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                             </svg>
                         </div>
@@ -150,7 +162,7 @@
                         </div>
                         <div class="mt-6 flex items-center justify-center text-pink-400 font-semibold">
                             <span>探索する</span>
-                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                             </svg>
                         </div>
@@ -186,7 +198,7 @@
                         </div>
                         <div class="mt-6 flex items-center justify-center text-cyan-400 font-semibold">
                             <span>探索する</span>
-                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                             </svg>
                         </div>
@@ -225,9 +237,12 @@
                 学問の世界への扉を開こう
             </p>
             <p class="text-gray-600 text-xs mt-2">
-                Academic Encyclopedia © 2024
+                Academic Encyclopedia © <span id="copyright-year"></span>
             </p>
         </div>
     </footer>
+    <script>
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

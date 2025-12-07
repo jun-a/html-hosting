@@ -1149,6 +1149,14 @@
                 const item = document.createElement('div');
                 item.className = 'era-item' + (era.id === selectedEra ? ' active' : '');
                 item.onclick = () => selectEra(era.id);
+                item.tabIndex = 0;
+                item.setAttribute('role', 'button');
+                item.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectEra(era.id);
+                    }
+                };
                 
                 item.innerHTML = `
                     <div class="era-icon">${era.icon}</div>
@@ -1173,6 +1181,14 @@
                 const card = document.createElement('div');
                 card.className = 'economist-card' + (selectedEconomist && selectedEconomist.id === economist.id ? ' selected' : '');
                 card.onclick = () => selectEconomist(economist);
+                card.tabIndex = 0;
+                card.setAttribute('role', 'button');
+                card.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectEconomist(economist);
+                    }
+                };
                 
                 card.innerHTML = `
                     <div class="economist-name">${economist.name}</div>
