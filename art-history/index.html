@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美術史図鑑 - Art History Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Palette = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="13.5" cy="6.5" r=".5"></circle>
+                <circle cx="17.5" cy="10.5" r=".5"></circle>
+                <circle cx="8.5" cy="7.5" r=".5"></circle>
+                <circle cx="6.5" cy="12.5" r=".5"></circle>
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+            </svg>
+        );
+        
+        const Sparkles = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"></path>
+            </svg>
+        );
+        
+        const Image = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        );
+        
+        const Grid3x3 = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+                <line x1="15" y1="3" x2="15" y2="21"></line>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="3" y1="15" x2="21" y2="15"></line>
+            </svg>
+        );
+        
+        const Zap = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'renaissance', title: 'ルネサンス', period: '1400 - 1600', icon: <Palette size={18} /> },
+            { id: 'baroque', title: 'バロック・ロマン', period: '1600 - 1850', icon: <Sparkles size={18} /> },
+            { id: 'impressionism', title: '印象派', period: '1850 - 1900', icon: <Image size={18} /> },
+            { id: 'modernism', title: 'モダニズム', period: '1900 - 1960', icon: <Grid3x3 size={18} /> },
+            { id: 'contemporary', title: '現代アート', period: '1960 - Present', icon: <Zap size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            renaissance: [
+                {
+                    id: 'davinci',
+                    name: 'レオナルド・ダ・ヴィンチ',
+                    title: 'ルネサンスの万能人',
+                    question: '芸術と科学は統合できるか？',
+                    answer: '観察と実験により可能である。',
+                    detail: '「モナ・リザ」「最後の晩餐」など不朽の名作を残す。解剖学、工学、建築、数学など多分野で業績。スフマート技法（輪郭をぼかす）を確立。人体の比例研究「ウィトルウィウス的人体図」も有名。',
+                    connection: 'ルネサンスの理想を体現。科学的観察と芸術の融合。',
+                    diagramType: 'vitruvian',
+                    diagramContent: null
+                },
+                {
+                    id: 'michelangelo',
+                    name: 'ミケランジェロ',
+                    title: '彫刻と壁画の巨匠',
+                    question: '人間の理想美をどう表現するか？',
+                    answer: '大理石から魂を解放する。',
+                    detail: 'システィーナ礼拝堂天井画「天地創造」、彫刻「ダビデ像」「ピエタ」など。人体の躍動感と精神性を大理石に刻む。「石の中に像が見える」と語った。晩年はサン・ピエトロ大聖堂の設計も。',
+                    connection: 'ルネサンス三大巨匠。バロック芸術への影響。',
+                    diagramType: 'sculpture',
+                    diagramContent: null
+                }
+            ],
+            baroque: [],
+            impressionism: [
+                {
+                    id: 'monet',
+                    name: 'クロード・モネ',
+                    title: '印象派の創始者',
+                    question: '光の移ろいをどう描くか？',
+                    answer: '瞬間の印象を色彩で捉える。',
+                    detail: '「印象、日の出」が印象派の名の由来。同じ対象を異なる時間や光で描く連作（睡蓮、積み藁、ルーアン大聖堂）。筆触分割により光の効果を表現。ジヴェルニーの庭園で晩年まで制作。',
+                    connection: '印象派運動の中心。光と色彩の革命。',
+                    diagramType: 'waterlily',
+                    diagramContent: null
+                }
+            ],
+            modernism: [
+                {
+                    id: 'picasso',
+                    name: 'パブロ・ピカソ',
+                    title: 'キュビスムの創始者',
+                    question: '対象を多角的に見ることは可能か？',
+                    answer: '複数の視点を一つの画面に統合する。',
+                    detail: '「アビニョンの娘たち」でキュビスム開始。ブラックと共に発展させる。青の時代、バラ色の時代を経て、生涯で様々な様式を展開。「ゲルニカ」で戦争を告発。20世紀最大の画家。',
+                    connection: '現代美術の起点。抽象絵画への道を開く。',
+                    diagramType: 'cubism',
+                    diagramContent: null
+                }
+            ],
+            contemporary: [
+                {
+                    id: 'duchamp',
+                    name: 'マルセル・デュシャン',
+                    title: 'レディメイドの発明者',
+                    question: '芸術とは何か？',
+                    answer: '文脈が芸術を作る。',
+                    detail: '「泉」（便器に署名して展示）でアートの定義を問い直す。レディメイド（既製品）という概念を提示。「階段を降りる裸体」など。コンセプチュアル・アートの先駆。「芸術は見る者が作る」。',
+                    connection: '現代美術の出発点。概念芸術への影響。',
+                    diagramType: 'readymade',
+                    diagramContent: null
+                },
+                {
+                    id: 'warhol',
+                    name: 'アンディ・ウォーホル',
+                    title: 'ポップアートの旗手',
+                    question: '大衆文化は芸術になるか？',
+                    answer: '反復と複製により可能だ。',
+                    detail: 'キャンベル・スープ缶、マリリン・モンローなど大衆文化のイメージをシルクスクリーンで量産。「誰もが15分間は有名になれる」と予言。ファクトリーで集団制作。商業とアートの境界を消す。',
+                    connection: '消費社会とアート。現代ポップカルチャーの基盤。',
+                    diagramType: 'silkscreen',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            if (type === 'vitruvian') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-6xl mb-2">👤</div>
+                        <div className="relative w-32 h-32 border-2 border-purple-500 rounded-full flex items-center justify-center">
+                            <div className="w-20 h-20 border-2 border-purple-400"></div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">ウィトルウィウス的人体</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'sculpture') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-6xl mb-2">🗿</div>
+                        <div className="text-xs text-gray-400">理想的人体美</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'waterlily') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-3">🌸💧🌊</div>
+                        <div className="text-xs text-gray-400">光と色の印象</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'cubism') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="grid grid-cols-2 gap-1">
+                            <div className="w-12 h-12 bg-blue-900 transform rotate-12"></div>
+                            <div className="w-12 h-12 bg-purple-900 transform -rotate-6"></div>
+                            <div className="w-12 h-12 bg-pink-900 transform rotate-6"></div>
+                            <div className="w-12 h-12 bg-indigo-900 transform -rotate-12"></div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-3">多視点の統合</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'readymade') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🚽</div>
+                        <div className="text-2xl mb-2">→</div>
+                        <div className="text-4xl">🎨</div>
+                        <div className="text-xs text-gray-400 mt-2">文脈が芸術を作る</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'silkscreen') {
+                return (
+                    <div className="grid grid-cols-2 gap-2 p-4">
+                        <div className="bg-pink-900 p-4 rounded flex items-center justify-center text-2xl">🥫</div>
+                        <div className="bg-blue-900 p-4 rounded flex items-center justify-center text-2xl">🥫</div>
+                        <div className="bg-green-900 p-4 rounded flex items-center justify-center text-2xl">🥫</div>
+                        <div className="bg-yellow-900 p-4 rounded flex items-center justify-center text-2xl">🥫</div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const ArtHistoryApp = () => {
+            const [selectedEra, setSelectedEra] = useState('renaissance');
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                    美術史図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Art History Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                美術史図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Art History Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-purple-900 border border-purple-600 shadow-lg shadow-purple-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">芸術家一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-purple-900/50 border border-purple-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-purple-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">芸術家一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-purple-900/50 border border-purple-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-purple-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ArtHistoryApp />);
+    </script>
+</body>
+</html>

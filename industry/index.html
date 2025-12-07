@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>産業イノベーション図鑑 - Industrial Innovation Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Book = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        );
+        
+        const Users = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+        
+        const Scale = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="M7 21h10"></path>
+                <path d="M12 3v18"></path>
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path>
+            </svg>
+        );
+        
+        const Lightbulb = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                <path d="M9 18h6"></path>
+                <path d="M10 22h4"></path>
+            </svg>
+        );
+        
+        const Network = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="2" width="6" height="6" rx="1"></rect>
+                <rect x="16" y="16" width="6" height="6" rx="1"></rect>
+                <rect x="2" y="16" width="6" height="6" rx="1"></rect>
+                <path d="M14 8v4a2 2 0 0 1-2 2H8"></path>
+                <path d="M8 14v2"></path>
+                <path d="M16 14v2"></path>
+            </svg>
+        );
+        
+        const Brain = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0-3 3v7a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3V8a3 3 0 0 0-3-3 3 3 0 0 0-3-3z"></path>
+            </svg>
+        );
+        
+        const Factory = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                <path d="M17 18h1"></path>
+                <path d="M12 18h1"></path>
+                <path d="M7 18h1"></path>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'first', title: '第1次機械化', period: '1760 - 1840', icon: <Factory size={18} /> },
+            { id: 'second', title: '第2次大量生産', period: '1870 - 1920', icon: <Factory size={18} /> },
+            { id: 'logistics', title: '物流革命', period: '1950 - 1980', icon: <Network size={18} /> },
+            { id: 'lean', title: 'リーン革命', period: '1970 - 2000', icon: <Lightbulb size={18} /> },
+            { id: 'industry4', title: '第4次インダストリー4.0', period: '2010 - Present', icon: <Brain size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            first: [
+                {
+                    id: 'watt',
+                    name: 'ジェームズ・ワット',
+                    title: '蒸気機関の改良者',
+                    question: '動力源を効率化できるか？',
+                    answer: '分離凝縮器により可能だ。',
+                    detail: 'ニューコメン機関を大幅改良(1769年特許)。分離凝縮器で効率を飛躍的向上。産業革命の技術的基盤。ワット(電力単位)に名を残す。ボルトンと組んで事業化。',
+                    connection: '産業革命の原動力。機械化時代の幕開け。',
+                    diagramType: 'steam',
+                    diagramContent: null
+                }
+            ],
+            second: [
+                {
+                    id: 'whitney',
+                    name: 'イーライ・ホイットニー',
+                    title: '互換性部品の導入者',
+                    question: '製造を標準化できるか？',
+                    answer: '互換性のある部品で可能だ。',
+                    detail: 'マスケット銃製造で互換性部品システムを導入(1798)。部品を標準化し、誰でも組み立て可能に。大量生産の基礎。綿繰り機の発明者としても有名。',
+                    connection: '大量生産システムの萌芽。フォードへと繋がる。',
+                    diagramType: 'interchangeable',
+                    diagramContent: null
+                },
+                {
+                    id: 'ford',
+                    name: 'ヘンリー・フォード',
+                    title: '流れ作業の創始者',
+                    question: '生産性を劇的に上げるには？',
+                    answer: 'コンベアによる流れ作業だ。',
+                    detail: 'Model T生産に移動組立ラインを導入(1913)。生産時間を12時間から93分に短縮。大量生産・大量消費の時代を開く。「フォーディズム」として社会現象に。',
+                    connection: '20世紀大量生産の象徴。テイラーと相補的。',
+                    diagramType: 'assembly_line',
+                    diagramContent: null
+                },
+                {
+                    id: 'taylor',
+                    name: 'フレデリック・テイラー',
+                    title: '科学的管理法の父',
+                    question: '作業を科学的に最適化できるか？',
+                    answer: '時間研究と動作研究で可能だ。',
+                    detail: '「科学的管理法」(1911)で作業の標準化と効率化を体系化。時間・動作研究により最適作業手順を決定。労働者と管理者の分離。20世紀の工場管理の基盤。',
+                    connection: '生産管理の科学化。フォードと並ぶ近代生産の双璧。',
+                    diagramType: 'time_study',
+                    diagramContent: null
+                }
+            ],
+            logistics: [
+                {
+                    id: 'mclean',
+                    name: 'マルコム・マクリーン',
+                    title: 'コンテナ輸送の革命者',
+                    question: '物流コストを下げるには？',
+                    answer: '標準化コンテナで革新する。',
+                    detail: '海上輸送用標準コンテナを開発(1956)。積み替え時間とコストを劇的削減。グローバル化の物理的基盤。「The Box」として物流革命を起こした。',
+                    connection: 'グローバルサプライチェーンの基礎。貿易の爆発的拡大。',
+                    diagramType: 'container',
+                    diagramContent: null
+                }
+            ],
+            lean: [
+                {
+                    id: 'ohno',
+                    name: '大野耐一',
+                    title: 'トヨタ生産方式の創始者',
+                    question: '無駄を徹底的に排除するには？',
+                    answer: 'ジャストインタイム方式で実現する。',
+                    detail: 'トヨタ生産方式(TPS)を確立。ジャストインタイム、かんばん方式、自働化。「7つのムダ」の概念。少人数で高効率。世界中で「リーン生産」として普及。',
+                    connection: '現代製造業の基準。リーン革命の中心。',
+                    diagramType: 'kanban',
+                    diagramContent: null
+                },
+                {
+                    id: 'shingo',
+                    name: '新郷重夫',
+                    title: 'ポカヨケの考案者',
+                    question: 'ミスを防ぐには？',
+                    answer: 'ミスができない仕組みを作る。',
+                    detail: 'ポカヨケ(mistake-proofing)を考案。SMED(シングル段取り)で段取り時間を劇的短縮。トヨタ生産方式の技術的支柱。品質管理の革命。',
+                    connection: '品質保証の新パラダイム。リーン生産の技術基盤。',
+                    diagramType: 'poka_yoke',
+                    diagramContent: null
+                }
+            ],
+            industry4: [
+                {
+                    id: 'cps',
+                    name: 'サイバーフィジカルシステム',
+                    title: 'インダストリー4.0の概念',
+                    question: '工場をどうスマート化するか？',
+                    answer: '物理とデジタルを統合する。',
+                    detail: 'ドイツ発のインダストリー4.0構想(2011)。IoT、AI、ビッグデータで工場をネットワーク化。サイバー空間と物理空間の統合(CPS)。マスカスタマイゼーション実現。',
+                    connection: '第4次産業革命。製造業のデジタル変革。',
+                    diagramType: 'industry4',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const IndustryApp = () => {
+            const [selectedEra, setSelectedEra] = useState(ERAS[0].id);
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
+                                    産業イノベーション図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Industrial Innovation Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
+                                産業イノベーション図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Industrial Innovation Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-orange-900 border border-orange-600 shadow-lg shadow-orange-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-orange-900/50 border border-orange-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-orange-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-orange-900/50 border border-orange-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-orange-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<IndustryApp />);
+    </script>
+</body>
+</html>

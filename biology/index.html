@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物学図鑑 - Biology Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Eye = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        );
+        
+        const Dna = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 15c6.667-6 13.333 0 20-6"></path>
+                <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
+                <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path>
+                <path d="m17 6-2.5-2.5"></path>
+                <path d="m14 8-1-1"></path>
+                <path d="m7 18 2.5 2.5"></path>
+                <path d="m3.5 14.5.5.5"></path>
+                <path d="m20 9 .5.5"></path>
+                <path d="m6.5 12.5 1 1"></path>
+                <path d="m16.5 10.5 1 1"></path>
+                <path d="m10 16 1.5 1.5"></path>
+            </svg>
+        );
+        
+        const TreeDeciduous = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 13v8"></path>
+                <path d="M12 3v5"></path>
+                <path d="m9 7-2 3 4 4-4 4 2 3h6l2-3-4-4 4-4-2-3Z"></path>
+            </svg>
+        );
+        
+        const Microscope = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 18h8"></path>
+                <path d="M3 22h18"></path>
+                <path d="M14 22a7 7 0 1 0 0-14h-1"></path>
+                <path d="M9 14h2"></path>
+                <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path>
+                <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path>
+            </svg>
+        );
+        
+        const Scissors = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="6" cy="6" r="3"></circle>
+                <circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'classification', title: '分類と観察', period: '1700 - 1850', icon: <Eye size={18} /> },
+            { id: 'evolution', title: '進化論の衝撃', period: '1850 - 1900', icon: <TreeDeciduous size={18} /> },
+            { id: 'genetics', title: '遺伝子の発見', period: '1900 - 1950', icon: <Dna size={18} /> },
+            { id: 'molecular', title: '分子生物学', period: '1950 - 2000', icon: <Microscope size={18} /> },
+            { id: 'modern', title: 'ゲノム編集と未来', period: '2000 - Present', icon: <Scissors size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            classification: [
+                {
+                    id: 'linnaeus',
+                    name: 'カール・フォン・リンネ',
+                    title: '生物分類学の父',
+                    question: '生物をどう整理するのか？',
+                    answer: '二名法による階層的分類を行う。',
+                    detail: '二名法（属名+種小名）を確立し、生物分類の基礎を築いた。「自然の体系」で生物を界・綱・目・科・属・種に分類。ホモ・サピエンスという人類の学名も彼が命名。',
+                    connection: '現代分類学の基盤。ダーウィンの進化論の前提。',
+                    diagramType: 'taxonomy',
+                    diagramContent: null
+                }
+            ],
+            evolution: [
+                {
+                    id: 'darwin',
+                    name: 'チャールズ・ダーウィン',
+                    title: '進化論の創始者',
+                    question: '生物はどう変化してきたのか？',
+                    answer: '自然選択により進化する。',
+                    detail: 'ビーグル号の航海で観察したガラパゴス諸島のフィンチの多様性から着想。「種の起源」（1859）で自然選択説を発表。適者生存により生物は環境に適応して進化する。',
+                    connection: '現代生物学の中心原理。メンデルと統合され総合説に。',
+                    diagramType: 'evolution_tree',
+                    diagramContent: null
+                }
+            ],
+            genetics: [
+                {
+                    id: 'mendel',
+                    name: 'グレゴール・メンデル',
+                    title: '遺伝学の父',
+                    question: '形質はどう受け継がれるのか？',
+                    answer: '遺伝因子（遺伝子）が親から子へ伝わる。',
+                    detail: 'エンドウ豆の交配実験で遺伝の法則を発見（1866）。優性・劣性の法則、分離の法則、独立の法則を提唱。生前は評価されず、死後16年後に再発見された。',
+                    connection: 'ダーウィンと統合され現代進化論へ。分子生物学の基礎。',
+                    diagramType: 'punnett_square',
+                    diagramContent: null
+                }
+            ],
+            molecular: [
+                {
+                    id: 'watson_crick',
+                    name: 'ワトソン & クリック',
+                    title: 'DNA二重らせん構造の発見者',
+                    question: 'DNAの構造は？',
+                    answer: '二重らせん構造である。',
+                    detail: 'ロザリンド・フランクリンのX線回折データを基に、1953年にDNAの二重らせん構造モデルを発表。A-T、G-Cの塩基対が相補的に結合。1962年ノーベル生理学・医学賞受賞。',
+                    connection: '分子生物学の誕生。遺伝情報の物理的実体を解明。',
+                    diagramType: 'dna_helix',
+                    diagramContent: null
+                },
+                {
+                    id: 'dawkins',
+                    name: 'リチャード・ドーキンス',
+                    title: '利己的遺伝子論の提唱者',
+                    question: '進化の単位は何か？',
+                    answer: '遺伝子である。',
+                    detail: '「利己的な遺伝子」（1976）で遺伝子中心の進化論を提唱。生物は遺伝子の「乗り物」であり、遺伝子が自己複製のために生物を利用する。ミーム（文化的遺伝子）の概念も提案。',
+                    connection: '現代進化生物学の重要視点。社会生物学論争の中心。',
+                    diagramType: 'selfish_gene',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'crispr',
+                    name: 'ダウドナ & シャルパンティエ',
+                    title: 'CRISPR-Cas9の開発者',
+                    question: 'ゲノムを自在に編集できるか？',
+                    answer: 'CRISPR-Cas9で可能になった。',
+                    detail: '細菌の免疫システムを応用したゲノム編集技術CRISPR-Cas9を開発（2012）。狙った遺伝子を正確に切断・編集できる。2020年ノーベル化学賞受賞。医療・農業・創薬に革命。',
+                    connection: 'ゲノム編集時代の幕開け。倫理的議論も活発化。',
+                    diagramType: 'crispr',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            if (type === 'taxonomy') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-3">🌳</div>
+                        <div className="flex flex-col gap-1 text-xs text-gray-300">
+                            <div>界 → 門 → 綱</div>
+                            <div>↓</div>
+                            <div>目 → 科 → 属 → 種</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'evolution_tree') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-40 h-40">
+                            <svg viewBox="0 0 200 200" className="w-full h-full">
+                                <line x1="100" y1="180" x2="100" y2="100" stroke="#10b981" strokeWidth="3" />
+                                <line x1="100" y1="100" x2="50" y2="50" stroke="#10b981" strokeWidth="2" />
+                                <line x1="100" y1="100" x2="150" y2="50" stroke="#10b981" strokeWidth="2" />
+                                <line x1="50" y1="50" x2="30" y2="20" stroke="#10b981" strokeWidth="2" />
+                                <line x1="50" y1="50" x2="70" y2="20" stroke="#10b981" strokeWidth="2" />
+                                <line x1="150" y1="50" x2="130" y2="20" stroke="#10b981" strokeWidth="2" />
+                                <line x1="150" y1="50" x2="170" y2="20" stroke="#10b981" strokeWidth="2" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">系統樹</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'punnett_square') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="grid grid-cols-3 gap-1">
+                            <div className="w-12 h-12 border border-gray-600"></div>
+                            <div className="w-12 h-12 border border-gray-600 flex items-center justify-center text-xs">A</div>
+                            <div className="w-12 h-12 border border-gray-600 flex items-center justify-center text-xs">a</div>
+                            <div className="w-12 h-12 border border-gray-600 flex items-center justify-center text-xs">A</div>
+                            <div className="w-12 h-12 border border-green-600 bg-green-900 flex items-center justify-center text-xs">AA</div>
+                            <div className="w-12 h-12 border border-green-600 bg-green-900 flex items-center justify-center text-xs">Aa</div>
+                            <div className="w-12 h-12 border border-gray-600 flex items-center justify-center text-xs">a</div>
+                            <div className="w-12 h-12 border border-green-600 bg-green-900 flex items-center justify-center text-xs">Aa</div>
+                            <div className="w-12 h-12 border border-green-600 bg-green-900 flex items-center justify-center text-xs">aa</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">パネット方格</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'dna_helix') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-32 h-40">
+                            <svg viewBox="0 0 128 160" className="w-full h-full">
+                                <path d="M 20,10 Q 64,30 108,10" stroke="#3b82f6" fill="none" strokeWidth="3" />
+                                <path d="M 20,40 Q 64,60 108,40" stroke="#3b82f6" fill="none" strokeWidth="3" />
+                                <path d="M 20,70 Q 64,90 108,70" stroke="#3b82f6" fill="none" strokeWidth="3" />
+                                <path d="M 20,100 Q 64,120 108,100" stroke="#3b82f6" fill="none" strokeWidth="3" />
+                                <path d="M 20,130 Q 64,150 108,130" stroke="#3b82f6" fill="none" strokeWidth="3" />
+                                <path d="M 108,10 Q 64,30 20,10" stroke="#10b981" fill="none" strokeWidth="3" />
+                                <path d="M 108,40 Q 64,60 20,40" stroke="#10b981" fill="none" strokeWidth="3" />
+                                <path d="M 108,70 Q 64,90 20,70" stroke="#10b981" fill="none" strokeWidth="3" />
+                                <path d="M 108,100 Q 64,120 20,100" stroke="#10b981" fill="none" strokeWidth="3" />
+                                <path d="M 108,130 Q 64,150 20,130" stroke="#10b981" fill="none" strokeWidth="3" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">二重らせん</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'selfish_gene') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🧬</div>
+                        <div className="text-2xl mb-2">↓</div>
+                        <div className="text-4xl">🐛</div>
+                        <div className="text-xs text-gray-400 mt-3">遺伝子が生物を操る</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'crispr') {
+                return (
+                    <div className="flex items-center justify-center gap-3 p-4">
+                        <div className="bg-blue-900 p-3 rounded text-xs">DNA</div>
+                        <div className="text-2xl">✂️</div>
+                        <div className="bg-green-900 p-3 rounded text-xs">編集</div>
+                        <div className="text-2xl">→</div>
+                        <div className="bg-purple-900 p-3 rounded text-xs">新DNA</div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const BiologyApp = () => {
+            const [selectedEra, setSelectedEra] = useState('classification');
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                                    生物学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Biology Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                                生物学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Biology Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-green-900 border border-green-600 shadow-lg shadow-green-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">生物学者一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-green-900/50 border border-green-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-green-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">生物学者一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-green-900/50 border border-green-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-green-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<BiologyApp />);
+    </script>
+</body>
+</html>

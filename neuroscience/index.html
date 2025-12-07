@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脳科学図鑑 - Neuroscience Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Book = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        );
+        
+        const Users = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+        
+        const Scale = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="M7 21h10"></path>
+                <path d="M12 3v18"></path>
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path>
+            </svg>
+        );
+        
+        const Lightbulb = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                <path d="M9 18h6"></path>
+                <path d="M10 22h4"></path>
+            </svg>
+        );
+        
+        const Network = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="2" width="6" height="6" rx="1"></rect>
+                <rect x="16" y="16" width="6" height="6" rx="1"></rect>
+                <rect x="2" y="16" width="6" height="6" rx="1"></rect>
+                <path d="M14 8v4a2 2 0 0 1-2 2H8"></path>
+                <path d="M8 14v2"></path>
+                <path d="M16 14v2"></path>
+            </svg>
+        );
+        
+        const Brain = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0-3 3v7a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3V8a3 3 0 0 0-3-3 3 3 0 0 0-3-3z"></path>
+            </svg>
+        );
+        
+        const Factory = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                <path d="M17 18h1"></path>
+                <path d="M12 18h1"></path>
+                <path d="M7 18h1"></path>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'early', title: '黎明期', period: '1800 - 1900', icon: <Brain size={18} /> },
+            { id: 'neuron', title: 'ニューロン・ドクトリン', period: '1900 - 1950', icon: <Network size={18} /> },
+            { id: 'plasticity', title: '可塑性と学習', period: '1950 - 1990', icon: <Lightbulb size={18} /> },
+            { id: 'modern', title: '現代', period: '1990 - Present', icon: <Brain size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            early: [
+                {
+                    id: 'broca',
+                    name: 'ポール・ブローカ',
+                    title: '脳の言語中枢の発見者',
+                    question: '言語機能は脳のどこにあるのか？',
+                    answer: '左前頭葉にある。',
+                    detail: '言語障害(失語症)患者の脳を解剖し、言語産出中枢(ブローカ野)を発見(1861)。脳の機能局在の証拠。「タン」と呼ばれた患者ルボルニュの症例が有名。近代神経科学の出発点。',
+                    connection: '脳機能局在論の確立。ウェルニッケと並ぶ。',
+                    diagramType: 'brain_areas',
+                    diagramContent: null
+                },
+                {
+                    id: 'penfield',
+                    name: 'ワイルダー・ペンフィールド',
+                    title: '脳地図の作成者',
+                    question: '脳のどこが体のどこを制御するのか？',
+                    answer: '体性感覚野と運動野に対応関係がある。',
+                    detail: 'てんかん手術中に脳を電気刺激し、脳の機能地図(ホムンクルス)を作成(1950年代)。運動野と体性感覚野の局在を詳細に解明。モントリオール神経学研究所を創設。',
+                    connection: '脳機能マッピングの基礎。現代脳画像研究の先駆。',
+                    diagramType: 'homunculus',
+                    diagramContent: null
+                }
+            ],
+            neuron: [
+                {
+                    id: 'cajal',
+                    name: 'サンティアゴ・ラモン・イ・カハール',
+                    title: 'ニューロン説の確立者',
+                    question: '神経系はどう構成されているのか？',
+                    answer: '独立したニューロンの集まりである。',
+                    detail: 'ゴルジ染色法を用いてニューロンの詳細な観察を行い、ニューロン・ドクトリン(神経細胞説)を確立。網状説を否定。1906年ノーベル生理学・医学賞(ゴルジと共同受賞)。',
+                    connection: '現代神経科学の基礎。シナプス概念への道。',
+                    diagramType: 'neuron',
+                    diagramContent: null
+                }
+            ],
+            plasticity: [
+                {
+                    id: 'hebb',
+                    name: 'ドナルド・ヘブ',
+                    title: 'シナプス可塑性理論の提唱者',
+                    question: '学習はどう起こるのか？',
+                    answer: '同時に発火するニューロンは結合を強める。',
+                    detail: '「行動の機構」(1949)でヘブ則を提唱。「一緒に発火するニューロンは、一緒に配線される(Cells that fire together, wire together)」。長期増強(LTP)の理論的基礎。',
+                    connection: '学習理論の神経科学的基盤。ニューラルネットワークの基礎。',
+                    diagramType: 'hebb_rule',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'libet',
+                    name: 'ベンジャミン・リベット',
+                    title: '自由意志の実験者',
+                    question: '意識的決定は自由か？',
+                    answer: '脳活動は意識的決定より先行する。',
+                    detail: '随意運動実験(1983)で、意識的決定の約0.5秒前に脳活動(準備電位)が始まることを発見。自由意志の問題に一石。哲学・倫理学にも大きな影響。',
+                    connection: '意識研究の重要実験。自由意志論争の中心。',
+                    diagramType: 'readiness_potential',
+                    diagramContent: null
+                },
+                {
+                    id: 'tononi',
+                    name: 'ジュリオ・トノーニ',
+                    title: '統合情報理論の提唱者',
+                    question: '意識とは何か？',
+                    answer: '統合された情報である。',
+                    detail: '統合情報理論(IIT)(2004-)を提唱。意識はΦ(ファイ)という統合情報量で定量化できる。意識は情報の統合度と相関。汎心論的含意。意識の科学的理論の最有力候補の一つ。',
+                    connection: '意識の数理理論。AIと意識の問題にも関連。',
+                    diagramType: 'phi',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const NeuroscienceApp = () => {
+            const [selectedEra, setSelectedEra] = useState(ERAS[0].id);
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-400 to-pink-500 bg-clip-text text-transparent">
+                                    脳科学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Neuroscience Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-pink-500 bg-clip-text text-transparent">
+                                脳科学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Neuroscience Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-pink-900 border border-pink-600 shadow-lg shadow-pink-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-pink-900/50 border border-pink-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-pink-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-pink-900/50 border border-pink-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-pink-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<NeuroscienceApp />);
+    </script>
+</body>
+</html>

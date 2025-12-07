@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>政治思想図鑑 - Political Thought Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Book = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        );
+        
+        const Users = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+        
+        const Scale = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                <path d="M7 21h10"></path>
+                <path d="M12 3v18"></path>
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path>
+            </svg>
+        );
+        
+        const Lightbulb = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                <path d="M9 18h6"></path>
+                <path d="M10 22h4"></path>
+            </svg>
+        );
+        
+        const Network = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="2" width="6" height="6" rx="1"></rect>
+                <rect x="16" y="16" width="6" height="6" rx="1"></rect>
+                <rect x="2" y="16" width="6" height="6" rx="1"></rect>
+                <path d="M14 8v4a2 2 0 0 1-2 2H8"></path>
+                <path d="M8 14v2"></path>
+                <path d="M16 14v2"></path>
+            </svg>
+        );
+        
+        const Brain = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0-3 3v7a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3V8a3 3 0 0 0-3-3 3 3 0 0 0-3-3z"></path>
+            </svg>
+        );
+        
+        const Factory = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+                <path d="M17 18h1"></path>
+                <path d="M12 18h1"></path>
+                <path d="M7 18h1"></path>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'realism', title: 'リアリズムと君主論', period: '1500 - 1700', icon: <Book size={18} /> },
+            { id: 'contract', title: '社会契約論', period: '1600 - 1800', icon: <Users size={18} /> },
+            { id: 'utility', title: '功利主義と自由', period: '1750 - 1900', icon: <Scale size={18} /> },
+            { id: 'modern', title: '現代の正義論', period: '1900 - Present', icon: <Lightbulb size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            realism: [
+                {
+                    id: 'machiavelli',
+                    name: 'ニッコロ・マキャベリ',
+                    title: '政治的リアリズムの祖',
+                    question: '君主はどう統治すべきか？',
+                    answer: '愛されるより恐れられよ。',
+                    detail: '「君主論」(1532)で理想ではなく現実の権力政治を論じた。道徳と政治の分離を主張。目的のためには手段を選ばない「マキャベリズム」の語源。フィレンツェ共和国の官僚として実務経験を積んだ。',
+                    connection: '近代政治学の創始者。権力の本質を直視。',
+                    diagramType: 'power',
+                    diagramContent: null
+                }
+            ],
+            contract: [
+                {
+                    id: 'hobbes',
+                    name: 'トマス・ホッブズ',
+                    title: '社会契約論の先駆者',
+                    question: '国家はなぜ必要か？',
+                    answer: '自然状態は「万人の万人に対する闘争」だからだ。',
+                    detail: '「リヴァイアサン」(1651)で社会契約説を展開。自然状態では生命が脅かされるため、人々は契約により主権者に権力を委ねる。絶対王政を擁護。唯物論的人間観。',
+                    connection: '近代国家論の基礎。ロックと対比される。',
+                    diagramType: 'leviathan',
+                    diagramContent: null
+                },
+                {
+                    id: 'locke',
+                    name: 'ジョン・ロック',
+                    title: '自由主義の父',
+                    question: '政府の正統性の源泉は？',
+                    answer: '人民の同意である。',
+                    detail: '「統治二論」(1689)で社会契約説を発展。自然状態には生命・自由・財産の権利がある。政府はこれを守るために契約で作られる。権力濫用には抵抗権がある。名誉革命を理論化。',
+                    connection: '立憲主義の基礎。アメリカ独立宣言に影響。',
+                    diagramType: 'natural_rights',
+                    diagramContent: null
+                }
+            ],
+            utility: [
+                {
+                    id: 'bentham',
+                    name: 'ジェレミー・ベンサム',
+                    title: '功利主義の創始者',
+                    question: '善とは何か？',
+                    answer: '最大多数の最大幸福である。',
+                    detail: '「道徳および立法の諸原理序説」(1789)で功利主義を体系化。快楽と苦痛が人間行動の原理。幸福計算により政策を評価。法改革運動を主導。パノプティコン(全展望監視システム)も構想。',
+                    connection: '功利主義の創始。ミルに継承される。',
+                    diagramType: 'utility',
+                    diagramContent: null
+                },
+                {
+                    id: 'mill',
+                    name: 'ジョン・スチュアート・ミル',
+                    title: '自由と功利の調和者',
+                    question: '個人の自由はどこまで？',
+                    answer: '他者に危害を加えない限り無制限だ。',
+                    detail: '「自由論」(1859)で思想・言論の自由を擁護。「危害原理」を提唱。功利主義を質的に洗練化(量より質)。女性参政権も支持。代議制民主主義を論じた。',
+                    connection: 'ベンサムの功利主義を発展。現代リベラリズムの源流。',
+                    diagramType: 'harm_principle',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'rawls',
+                    name: 'ジョン・ロールズ',
+                    title: '現代正義論の巨人',
+                    question: '公正な社会とは？',
+                    answer: '無知のヴェールの下で合意される原理に基づく社会だ。',
+                    detail: '「正義論」(1971)で功利主義を批判し契約論を復興。原初状態で無知のヴェールをかぶり、自分の立場を知らない状態で選ぶ原理が正義。格差原理:不平等は最も不遇な人の利益になる場合のみ許される。',
+                    connection: '20世紀最重要の政治哲学。リベラリズムの理論的支柱。',
+                    diagramType: 'veil',
+                    diagramContent: null
+                },
+                {
+                    id: 'sandel',
+                    name: 'マイケル・サンデル',
+                    title: 'コミュニタリアンの旗手',
+                    question: '正義とは何か？',
+                    answer: '共同体の価値と美徳を考慮すべきだ。',
+                    detail: 'ロールズのリベラリズムを批判。「負荷なき自我」を否定し、人間は共同体的文脈の中にある。「これからの『正義』の話をしよう」で世界的に有名に。ハーバード大学の「Justice」講義が人気。',
+                    connection: 'コミュニタリアニズムの代表。現代政治哲学論争の中心。',
+                    diagramType: 'community',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const PoliticsApp = () => {
+            const [selectedEra, setSelectedEra] = useState(ERAS[0].id);
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
+                                    政治思想図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Political Thought Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
+                                政治思想図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Political Thought Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-red-900 border border-red-600 shadow-lg shadow-red-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-red-900/50 border border-red-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-red-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-red-900/50 border border-red-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-red-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PoliticsApp />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理学図鑑 - Psychology Illustrated Book</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Brain = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0-3 3v7a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3V8a3 3 0 0 0-3-3 3 3 0 0 0-3-3z"></path>
+            </svg>
+        );
+        
+        const User = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        );
+        
+        const Heart = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+        );
+        
+        const Sparkles = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"></path>
+                <path d="M19 3l.5 2.5L22 6l-2.5.5L19 9l-.5-2.5L16 6l2.5-.5L19 3z"></path>
+            </svg>
+        );
+        
+        const Lightbulb = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                <path d="M9 18h6"></path>
+                <path d="M10 22h4"></path>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        const ERAS = [
+            { id: 'psychoanalysis', title: '精神分析', period: '1890 - 1930', icon: <Brain size={18} /> },
+            { id: 'behaviorism', title: '行動主義', period: '1920 - 1960', icon: <User size={18} /> },
+            { id: 'humanistic', title: '人間性心理学', period: '1950 - 1970', icon: <Heart size={18} /> },
+            { id: 'cognitive', title: '認知革命', period: '1960 - 1990', icon: <Sparkles size={18} /> },
+            { id: 'modern', title: '現代', period: '1990 - Present', icon: <Lightbulb size={18} /> },
+        ];
+        
+        const PIONEERS = {
+            psychoanalysis: [
+                {
+                    id: 'freud',
+                    name: 'ジークムント・フロイト',
+                    title: '精神分析の創始者',
+                    question: '心の奥底には何があるのか？',
+                    answer: '無意識が存在し、人間の行動を支配している。',
+                    detail: 'イド・エゴ・スーパーエゴの構造モデルを提唱。夢分析や自由連想法により無意識を探求。性的衝動（リビドー）を人間の基本的動機とみなした。精神分析は心理療法の原点となった。',
+                    connection: '精神分析学派の創始者。ユングやアドラーに影響。',
+                    diagramType: 'iceberg',
+                    diagramContent: null
+                },
+                {
+                    id: 'jung',
+                    name: 'カール・グスタフ・ユング',
+                    title: '分析心理学の創始者',
+                    question: '人類共通の無意識はあるのか？',
+                    answer: '集合的無意識が存在し、元型が含まれる。',
+                    detail: 'フロイトの弟子だったが独自の分析心理学を確立。個人的無意識に加えて集合的無意識の概念を提唱。元型、シャドウ、アニマ・アニムスなど。内向型・外向型の性格分類も。',
+                    connection: 'フロイトから独立。元型理論で神話学にも影響。',
+                    diagramType: 'archetype',
+                    diagramContent: null
+                }
+            ],
+            behaviorism: [
+                {
+                    id: 'pavlov',
+                    name: 'イワン・パブロフ',
+                    title: '古典的条件づけの発見者',
+                    question: '学習はどのように起こるのか？',
+                    answer: '刺激と反応の関連付けによって起こる。',
+                    detail: '犬の唾液分泌実験で古典的条件づけを発見（1902年ノーベル生理学・医学賞）。ベルの音と餌を結びつけることで、ベルだけで唾液が分泌される。学習理論の基礎を築いた。',
+                    connection: '行動主義の生理学的基盤。ワトソンに影響。',
+                    diagramType: 'conditioning',
+                    diagramContent: null
+                },
+                {
+                    id: 'skinner',
+                    name: 'バラス・フレデリック・スキナー',
+                    title: 'オペラント条件づけの提唱者',
+                    question: '行動をどう強化できるのか？',
+                    answer: '報酬や罰により行動を形成できる。',
+                    detail: 'スキナー箱を用いた実験でオペラント条件づけを研究。強化スケジュール理論を確立。行動分析学の創始者。「自由と尊厳を超えて」で人間行動の制御可能性を主張。',
+                    connection: '徹底的行動主義。現代の応用行動分析に影響。',
+                    diagramType: 'operant',
+                    diagramContent: null
+                }
+            ],
+            humanistic: [
+                {
+                    id: 'maslow',
+                    name: 'アブラハム・マズロー',
+                    title: '自己実現理論の提唱者',
+                    question: '人間の究極の動機は何か？',
+                    answer: '自己実現への欲求である。',
+                    detail: '欲求階層説（マズローの5段階欲求）を提唱。生理的欲求→安全→所属と愛→承認→自己実現という階層構造。人間性心理学の中心人物。ピーク体験の研究も。',
+                    connection: '人間性心理学の創始者の一人。ポジティブ心理学の先駆。',
+                    diagramType: 'pyramid',
+                    diagramContent: null
+                }
+            ],
+            cognitive: [
+                {
+                    id: 'cognitive_revolution',
+                    name: '認知革命',
+                    title: '情報処理としての心',
+                    question: '心はコンピュータのように働くのか？',
+                    answer: '心は情報を処理するシステムである。',
+                    detail: '1950-60年代、行動主義への反動として起こった革命。心を情報処理システムとみなす。認知心理学の誕生。記憶、注意、問題解決などの内的プロセスを研究対象に。',
+                    connection: 'AI・計算機科学との接点。認知科学の基礎。',
+                    diagramType: 'info_processing',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'seligman',
+                    name: 'マーティン・セリグマン',
+                    title: 'ポジティブ心理学の創始者',
+                    question: '幸福とは何か？どう測定するのか？',
+                    answer: 'ウェルビーイングは測定可能で、向上させることができる。',
+                    detail: '学習性無力感の研究から出発し、ポジティブ心理学を創始。PERMA理論（Positive emotion, Engagement, Relationships, Meaning, Achievement）を提唱。幸福の科学的研究を確立。',
+                    connection: '臨床心理学から幸福研究へ。現代ウェルビーイング研究の中心。',
+                    diagramType: 'perma',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        const DiagramBuilder = ({ type }) => {
+            if (type === 'iceberg') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-40 h-40">
+                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-blue-300 w-20 h-10 rounded-t-full"></div>
+                            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[16px] border-r-[16px] border-t-[20px] border-l-transparent border-r-transparent border-t-blue-400"></div>
+                            <div className="absolute top-0 left-16 text-xs text-gray-300">意識</div>
+                            <div className="absolute top-20 left-12 text-xs text-gray-300">無意識</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">氷山モデル</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'archetype') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🎭</div>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div className="bg-purple-900 p-2 rounded text-xs text-center">元型</div>
+                            <div className="bg-pink-900 p-2 rounded text-xs text-center">シャドウ</div>
+                            <div className="bg-blue-900 p-2 rounded text-xs text-center">アニマ</div>
+                            <div className="bg-green-900 p-2 rounded text-xs text-center">アニムス</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'conditioning') {
+                return (
+                    <div className="flex items-center justify-center gap-3 p-4">
+                        <div className="bg-gray-800 p-3 rounded text-xs">🔔 ベル</div>
+                        <div className="text-2xl">+</div>
+                        <div className="bg-gray-800 p-3 rounded text-xs">🍖 餌</div>
+                        <div className="text-2xl">→</div>
+                        <div className="bg-pink-900 p-3 rounded text-xs">💧 唾液</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'operant') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🐀</div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <div className="bg-blue-900 p-2 rounded text-xs">行動</div>
+                            <div className="text-xl">→</div>
+                            <div className="bg-green-900 p-2 rounded text-xs">報酬</div>
+                            <div className="text-xl">→</div>
+                            <div className="bg-purple-900 p-2 rounded text-xs">強化</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'pyramid') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="w-0 h-0 border-l-[60px] border-r-[60px] border-b-[100px] border-l-transparent border-r-transparent border-b-pink-800 relative">
+                            <div className="absolute top-24 -left-12 text-[10px] text-gray-300">生理</div>
+                            <div className="absolute top-16 -left-12 text-[10px] text-gray-300">安全</div>
+                            <div className="absolute top-8 -left-16 text-[10px] text-gray-300">所属</div>
+                            <div className="absolute top-2 -left-16 text-[10px] text-gray-300">承認</div>
+                            <div className="absolute -top-4 -left-20 text-[10px] text-gray-300">自己実現</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'info_processing') {
+                return (
+                    <div className="flex items-center justify-center gap-3 p-4">
+                        <div className="bg-blue-900 p-3 rounded text-xs">入力</div>
+                        <div className="text-2xl">→</div>
+                        <div className="bg-purple-900 p-3 rounded text-xs">処理</div>
+                        <div className="text-2xl">→</div>
+                        <div className="bg-green-900 p-3 rounded text-xs">出力</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'perma') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-3">🌟</div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-yellow-900 p-2 rounded text-xs text-center">P: 快楽</div>
+                            <div className="bg-blue-900 p-2 rounded text-xs text-center">E: 没入</div>
+                            <div className="bg-green-900 p-2 rounded text-xs text-center">R: 関係</div>
+                            <div className="bg-purple-900 p-2 rounded text-xs text-center">M: 意味</div>
+                            <div className="bg-pink-900 p-2 rounded text-xs text-center col-span-2">A: 達成</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        const PsychologyApp = () => {
+            const [selectedEra, setSelectedEra] = useState('psychoanalysis');
+            const [selectedPioneer, setSelectedPioneer] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const pioneers = PIONEERS[selectedEra] || [];
+                setSelectedPioneer(pioneers[0] || null);
+            }, [selectedEra]);
+            
+            const pioneers = PIONEERS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePioneerSelect = (pioneer) => {
+                setSelectedPioneer(pioneer);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1"></div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent">
+                                    心理学図鑑
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Psychology Illustrated Book</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden text-center">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent">
+                                心理学図鑑
+                            </h1>
+                            <p className="text-gray-400 text-xs mt-2">Psychology Illustrated Book</p>
+                        </div>
+                    </header>
+                    
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-pink-900 border border-pink-600 shadow-lg shadow-pink-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">心理学者一覧</h2>
+                            {pioneers.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPioneer?.id === p.id
+                                            ? 'bg-pink-900/50 border border-pink-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPioneer(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPioneer && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-pink-400 mb-3">{selectedPioneer.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPioneer.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPioneer.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPioneer.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPioneer.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPioneer.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPioneer.diagramType} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">心理学者一覧</h2>
+                                {pioneers.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPioneer?.id === p.id
+                                                ? 'bg-pink-900/50 border border-pink-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePioneerSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPioneer && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-pink-400 mb-2">{selectedPioneer.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPioneer.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPioneer.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPioneer.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPioneer.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPioneer.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPioneer.diagramType} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PsychologyApp />);
+    </script>
+</body>
+</html>
