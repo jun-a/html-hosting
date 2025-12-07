@@ -108,6 +108,10 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
             h1 {
                 font-size: 2rem;
             }
@@ -118,6 +122,28 @@
             
             .cards {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+                min-height: 200px;
+            }
+            
+            .card:active {
+                transform: translateY(-4px);
+            }
+            
+            .card-icon {
+                font-size: 3rem;
+            }
+            
+            .card-title {
+                font-size: 1.25rem;
+            }
+            
+            header {
+                margin-bottom: 2rem;
             }
         }
         

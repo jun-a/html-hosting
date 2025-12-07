@@ -1478,6 +1478,88 @@
         .detail-area::-webkit-scrollbar-thumb:hover {
             background: #6b7280;
         }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 767px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            header p {
+                font-size: 0.75rem;
+            }
+            
+            .main-content {
+                display: block;
+                height: calc(100vh - 90px);
+            }
+            
+            .era-sidebar,
+            .philosopher-sidebar,
+            .detail-area {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #1f2937;
+                height: 100%;
+                display: none;
+            }
+            
+            .era-sidebar.mobile-active,
+            .philosopher-sidebar.mobile-active,
+            .detail-area.mobile-active {
+                display: block;
+            }
+            
+            .mobile-back-button {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #60a5fa;
+                background: none;
+                border: none;
+                font-size: 0.875rem;
+                cursor: pointer;
+                padding: 0.5rem 0;
+                margin-bottom: 1rem;
+            }
+            
+            .mobile-back-button:active {
+                color: #3b82f6;
+            }
+            
+            .era-item,
+            .philosopher-item {
+                position: relative;
+            }
+            
+            .era-item::after {
+                content: '›';
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #9ca3af;
+                font-size: 1.5rem;
+            }
+            
+            .detail-card {
+                padding: 1.5rem;
+            }
+            
+            .detail-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .detail-header p {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-back-button {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1489,20 +1571,19 @@
         
         <div class="main-content">
             <!-- Left sidebar: Eras -->
-            <div class="era-sidebar" id="eraSidebar"></div>
+            <div class="era-sidebar mobile-active" id="eraSidebar"></div>
             
             <!-- Middle sidebar: Philosophers -->
-            <div class="philosopher-sidebar">
+            <div class="philosopher-sidebar" id="philosopherSidebar">
+                <button class="mobile-back-button" id="backToEras">
+                    <span style="font-size: 1.25rem;">‹</span> 戻る
+                </button>
                 <h2>哲学者一覧</h2>
                 <div id="philosopherList"></div>
             </div>
             
             <!-- Main content: Philosopher details -->
-            <div class="detail-area" id="detailArea">
-                <div class="empty-state">
-                    哲学者を選択してください
-                </div>
-            </div>
+            <div class="detail-area" id="detailArea"></div>
         </div>
     </div>
     
@@ -1833,6 +1914,34 @@
         
         let selectedEra = 'ancient';
         let selectedPhilosopher = null;
+        let mobileView = 'eras'; // 'eras', 'philosophers', 'content'
+        
+        // Check if mobile
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+        
+        // Switch mobile view
+        function switchMobileView(view) {
+            if (!isMobile()) return;
+            
+            mobileView = view;
+            const eraSidebar = document.getElementById('eraSidebar');
+            const philosopherSidebar = document.getElementById('philosopherSidebar');
+            const detailArea = document.getElementById('detailArea');
+            
+            eraSidebar.classList.remove('mobile-active');
+            philosopherSidebar.classList.remove('mobile-active');
+            detailArea.classList.remove('mobile-active');
+            
+            if (view === 'eras') {
+                eraSidebar.classList.add('mobile-active');
+            } else if (view === 'philosophers') {
+                philosopherSidebar.classList.add('mobile-active');
+            } else if (view === 'content') {
+                detailArea.classList.add('mobile-active');
+            }
+        }
         
         // ============================================================================
         // DIAGRAM BUILDERS
@@ -2288,6 +2397,13 @@
                 return;
             }
             
+            // Add mobile back button
+            const backButton = document.createElement('button');
+            backButton.className = 'mobile-back-button';
+            backButton.innerHTML = '<span style="font-size: 1.25rem;">‹</span> 戻る';
+            backButton.onclick = () => switchMobileView('philosophers');
+            area.appendChild(backButton);
+            
             const card = document.createElement('div');
             card.className = 'detail-card';
             
@@ -2364,12 +2480,22 @@
             renderEras();
             renderPhilosophers();
             renderDetail();
+            
+            // On mobile, switch to philosophers view
+            if (isMobile()) {
+                switchMobileView('philosophers');
+            }
         }
         
         function selectPhilosopher(philosopher) {
             selectedPhilosopher = philosopher;
             renderPhilosophers();
             renderDetail();
+            
+            // On mobile, switch to content view
+            if (isMobile()) {
+                switchMobileView('content');
+            }
         }
         
         // ============================================================================
@@ -2384,6 +2510,25 @@
             renderEras();
             renderPhilosophers();
             renderDetail();
+            
+            // Mobile back button from philosophers to eras
+            const backToEras = document.getElementById('backToEras');
+            if (backToEras) {
+                backToEras.onclick = () => switchMobileView('eras');
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (!isMobile()) {
+                    // Reset mobile view classes on desktop
+                    document.getElementById('eraSidebar').classList.remove('mobile-active');
+                    document.getElementById('philosopherSidebar').classList.remove('mobile-active');
+                    document.getElementById('detailArea').classList.remove('mobile-active');
+                } else {
+                    // Ensure current view is active on mobile
+                    switchMobileView(mobileView);
+                }
+            });
         });
     </script>
 </body>
