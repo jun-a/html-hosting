@@ -539,6 +539,26 @@
                 setSelectedPhysicist(physicists[0] || null);
             }, [selectedEra]);
             
+            useEffect(() => {
+                // Render KaTeX formulas when content changes
+                if (typeof window.renderMathInElement !== 'undefined') {
+                    setTimeout(() => {
+                        try {
+                            window.renderMathInElement(document.body, {
+                                delimiters: [
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '\\\\(', right: '\\\\)', display: false},
+                                    {left: '$', right: '$', display: false}
+                                ],
+                                throwOnError: false
+                            });
+                        } catch (e) {
+                            console.log('KaTeX rendering error:', e);
+                        }
+                    }, 100);
+                }
+            }, [selectedPhysicist]);
+            
             const physicists = PHYSICISTS[selectedEra] || [];
             
             const handleEraSelect = (eraId) => {
