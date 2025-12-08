@@ -26,19 +26,39 @@
         // KaTeX rendering component
         const KatexFormula = ({ formula, className = "", displayMode = true }) => {
             const ref = useRef(null);
+            const [fallback, setFallback] = useState(false);
             
             useEffect(() => {
-                if (ref.current && window.katex) {
-                    try {
-                        window.katex.render(formula, ref.current, {
-                            throwOnError: false,
-                            displayMode: displayMode
-                        });
-                    } catch (e) {
-                        console.error("KaTeX rendering error:", e);
+                const renderFormula = () => {
+                    if (ref.current && window.katex) {
+                        try {
+                            window.katex.render(formula, ref.current, {
+                                throwOnError: false,
+                                displayMode: displayMode
+                            });
+                        } catch (e) {
+                            console.error("KaTeX rendering error:", e);
+                            setFallback(true);
+                        }
+                    } else {
+                        // KaTeX not loaded yet, retry after a short delay
+                        const timeout = setTimeout(() => {
+                            if (!window.katex) {
+                                setFallback(true);
+                            } else {
+                                renderFormula();
+                            }
+                        }, 100);
+                        return () => clearTimeout(timeout);
                     }
-                }
+                };
+                
+                renderFormula();
             }, [formula, displayMode]);
+            
+            if (fallback) {
+                return <div className={className}>{formula}</div>;
+            }
             
             return <div ref={ref} className={className}></div>;
         };
