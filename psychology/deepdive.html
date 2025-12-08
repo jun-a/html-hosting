@@ -843,8 +843,374 @@
                 );
             }
             
-            // Add more diagram types with similar enhanced styling...
-            // For brevity, I'll add placeholders for others
+            // Additional diagram types
+            if (type === 'inferiority') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">劣等感と補償（アドラー）</div>
+                        <div className="flex flex-col gap-4 w-full max-w-sm">
+                            <div className="bg-red-900/30 border-2 border-red-600 p-4 rounded-lg text-center">
+                                <div className="text-2xl mb-2">😔</div>
+                                <div className="text-sm font-bold text-red-400">劣等感</div>
+                                <div className="text-xs text-gray-300 mt-1">普遍的な人間の経験</div>
+                            </div>
+                            <div className="text-2xl text-center">↓</div>
+                            <div className="bg-blue-900/30 border-2 border-blue-600 p-4 rounded-lg text-center">
+                                <div className="text-2xl mb-2">💪</div>
+                                <div className="text-sm font-bold text-blue-400">補償・優越性の追求</div>
+                                <div className="text-xs text-gray-300 mt-1">劣等感を克服しようとする</div>
+                            </div>
+                            <div className="text-2xl text-center">↓</div>
+                            <div className="bg-green-900/30 border-2 border-green-600 p-4 rounded-lg text-center">
+                                <div className="text-2xl mb-2">🤝</div>
+                                <div className="text-sm font-bold text-green-400">共同体感覚</div>
+                                <div className="text-xs text-gray-300 mt-1">健全な成長の方向</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'object_relations') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">対象関係論（クライン）</div>
+                        <div className="space-y-3 w-full max-w-sm">
+                            <div className="bg-purple-900/30 border border-purple-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold text-purple-300">妄想分裂ポジション</div>
+                                <div className="text-xs text-gray-300 mt-1">生後3-4ヶ月：良い対象と悪い対象の分裂</div>
+                            </div>
+                            <div className="text-center text-gray-500">↓ 発達</div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold text-blue-300">抑うつポジション</div>
+                                <div className="text-xs text-gray-300 mt-1">生後4-6ヶ月：対象の全体性の認識</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'symbolic_order') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">ラカンの三界</div>
+                        <div className="grid grid-cols-1 gap-3 w-full max-w-sm">
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold text-blue-300">想像界（Imaginary）</div>
+                                <div className="text-xs text-gray-300 mt-1">イメージ、鏡像段階</div>
+                            </div>
+                            <div className="bg-red-900/30 border border-red-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold text-red-300">象徴界（Symbolic）</div>
+                                <div className="text-xs text-gray-300 mt-1">言語、法、父の名</div>
+                            </div>
+                            <div className="bg-gray-800 border border-gray-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold text-gray-300">現実界（Real）</div>
+                                <div className="text-xs text-gray-300 mt-1">象徴化できない残余</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'watson_sr' || type === 'thorndike_law') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">S-R理論</div>
+                        <div className="flex items-center gap-4">
+                            <div className="bg-blue-900 p-4 rounded-lg text-center">
+                                <div className="text-sm font-bold">刺激 (S)</div>
+                                <div className="text-xs text-gray-300 mt-1">Stimulus</div>
+                            </div>
+                            <div className="text-3xl">→</div>
+                            <div className="bg-green-900 p-4 rounded-lg text-center">
+                                <div className="text-sm font-bold">反応 (R)</div>
+                                <div className="text-xs text-gray-300 mt-1">Response</div>
+                            </div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-4 text-center max-w-xs">
+                            すべての行動は刺激と反応の結びつきで説明できる
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'rogers_conditions') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">治療的変化の条件（ロジャーズ）</div>
+                        <div className="space-y-2 w-full max-w-sm">
+                            <div className="bg-green-900/30 border border-green-600 p-2 rounded text-xs">
+                                ① 一致（純粋性）- セラピストの誠実さ
+                            </div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-2 rounded text-xs">
+                                ② 無条件の肯定的関心 - 受容と尊重
+                            </div>
+                            <div className="bg-purple-900/30 border border-purple-600 p-2 rounded text-xs">
+                                ③ 共感的理解 - クライアントの世界を理解
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'logotherapy') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">意味の発見の3つの道（フランクル）</div>
+                        <div className="space-y-3 w-full max-w-sm">
+                            <div className="bg-yellow-900/30 border border-yellow-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold">① 創造価値</div>
+                                <div className="text-xs text-gray-300 mt-1">仕事、創造活動</div>
+                            </div>
+                            <div className="bg-pink-900/30 border border-pink-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold">② 体験価値</div>
+                                <div className="text-xs text-gray-300 mt-1">愛、芸術、自然</div>
+                            </div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded-lg">
+                                <div className="text-sm font-bold">③ 態度価値</div>
+                                <div className="text-xs text-gray-300 mt-1">苦悩への態度</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'piaget_stages') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">ピアジェの認知発達段階</div>
+                        <div className="space-y-2 w-full max-w-md">
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded">
+                                <div className="text-sm font-bold">① 感覚運動期（0-2歳）</div>
+                                <div className="text-xs text-gray-300 mt-1">対象の永続性</div>
+                            </div>
+                            <div className="bg-green-900/30 border border-green-600 p-3 rounded">
+                                <div className="text-sm font-bold">② 前操作期（2-7歳）</div>
+                                <div className="text-xs text-gray-300 mt-1">象徴機能、自己中心性</div>
+                            </div>
+                            <div className="bg-yellow-900/30 border border-yellow-600 p-3 rounded">
+                                <div className="text-sm font-bold">③ 具体的操作期（7-11歳）</div>
+                                <div className="text-xs text-gray-300 mt-1">保存概念、可逆性</div>
+                            </div>
+                            <div className="bg-purple-900/30 border border-purple-600 p-3 rounded">
+                                <div className="text-sm font-bold">④ 形式的操作期（11歳～）</div>
+                                <div className="text-xs text-gray-300 mt-1">抽象的思考</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'zpd') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">最近接発達領域（ヴィゴツキー）</div>
+                        <div className="relative w-full max-w-sm h-48">
+                            <div className="absolute inset-x-0 bottom-0 h-16 bg-green-900/50 border-2 border-green-600 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold">自力でできること</span>
+                            </div>
+                            <div className="absolute inset-x-0 bottom-16 h-20 bg-yellow-900/50 border-2 border-yellow-600 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold">援助があればできること<br/>(ZPD)</span>
+                            </div>
+                            <div className="absolute inset-x-0 top-0 h-12 bg-gray-800/50 border-2 border-gray-600 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold">まだできないこと</span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'discovery_learning' || type === 'perceptual_cycle') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">認知プロセス</div>
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="bg-blue-900 p-3 rounded-lg text-center w-40">
+                                <div className="text-sm">知覚・認知</div>
+                            </div>
+                            <div className="text-2xl">↕️</div>
+                            <div className="bg-purple-900 p-3 rounded-lg text-center w-40">
+                                <div className="text-sm">スキーマ</div>
+                            </div>
+                            <div className="text-2xl">↕️</div>
+                            <div className="bg-green-900 p-3 rounded-lg text-center w-40">
+                                <div className="text-sm">行動・探索</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'milgram_experiment') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">ミルグラム服従実験</div>
+                        <div className="space-y-3 w-full max-w-sm text-center">
+                            <div className="bg-gray-800 p-3 rounded">
+                                <div className="text-sm">👨‍🔬 実験者（権威者）</div>
+                            </div>
+                            <div className="text-xl">↓ 指示</div>
+                            <div className="bg-blue-900 p-3 rounded">
+                                <div className="text-sm">👤 参加者（教師役）</div>
+                            </div>
+                            <div className="text-xl">↓ 電気ショック</div>
+                            <div className="bg-red-900 p-3 rounded">
+                                <div className="text-sm">😰 学習者（協力者）</div>
+                            </div>
+                            <div className="text-xs text-gray-400 mt-4">65%が最大ショックまで服従</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'stanford_prison' || type === 'asch_conformity' || type === 'cognitive_dissonance') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">社会的影響</div>
+                        <div className="text-center">
+                            <div className="text-4xl mb-3">👥</div>
+                            <div className="text-xs text-gray-300">状況と集団が個人の行動を決定する</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'erikson_stages') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">エリクソンの8段階</div>
+                        <div className="space-y-2 w-full max-w-md text-xs">
+                            <div className="bg-blue-900/30 border border-blue-600 p-2 rounded">① 乳児期：信頼 vs 不信</div>
+                            <div className="bg-green-900/30 border border-green-600 p-2 rounded">② 幼児期前期：自律性 vs 恥</div>
+                            <div className="bg-yellow-900/30 border border-yellow-600 p-2 rounded">③ 幼児期後期：積極性 vs 罪悪感</div>
+                            <div className="bg-purple-900/30 border border-purple-600 p-2 rounded">④ 学童期：勤勉性 vs 劣等感</div>
+                            <div className="bg-pink-900/30 border border-pink-600 p-2 rounded">⑤ 青年期：アイデンティティ vs 役割混乱</div>
+                            <div className="bg-red-900/30 border border-red-600 p-2 rounded">⑥ 成人期初期：親密性 vs 孤立</div>
+                            <div className="bg-orange-900/30 border border-orange-600 p-2 rounded">⑦ 成人期：生殖性 vs 停滞</div>
+                            <div className="bg-gray-700/30 border border-gray-500 p-2 rounded">⑧ 老年期：統合性 vs 絶望</div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'attachment_system' || type === 'strange_situation') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">愛着スタイル</div>
+                        <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+                            <div className="bg-green-900/30 border border-green-600 p-3 rounded col-span-2">
+                                <div className="text-sm font-bold text-green-300">安定型（65%）</div>
+                                <div className="text-xs text-gray-300 mt-1">安全基地として養育者を利用</div>
+                            </div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded">
+                                <div className="text-sm font-bold text-blue-300">回避型（20%）</div>
+                                <div className="text-xs text-gray-300 mt-1">養育者を無視</div>
+                            </div>
+                            <div className="bg-yellow-900/30 border border-yellow-600 p-3 rounded">
+                                <div className="text-sm font-bold text-yellow-300">アンビバレント型（15%）</div>
+                                <div className="text-xs text-gray-300 mt-1">執着と抵抗</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'dual_process') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">二重プロセス理論（カーネマン）</div>
+                        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                            <div className="bg-red-900/30 border-2 border-red-600 p-4 rounded-lg">
+                                <div className="text-lg font-bold text-red-300 mb-2">システム1</div>
+                                <div className="text-xs space-y-1 text-gray-300">
+                                    <div>⚡ 速い</div>
+                                    <div>🤖 自動的</div>
+                                    <div>😊 直感的</div>
+                                    <div>⚠️ バイアスあり</div>
+                                </div>
+                            </div>
+                            <div className="bg-blue-900/30 border-2 border-blue-600 p-4 rounded-lg">
+                                <div className="text-lg font-bold text-blue-300 mb-2">システム2</div>
+                                <div className="text-xs space-y-1 text-gray-300">
+                                    <div>🐌 遅い</div>
+                                    <div>🧠 意識的</div>
+                                    <div>📐 論理的</div>
+                                    <div>😴 怠惰</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'flow_model') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">フローチャンネル</div>
+                        <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
+                            <div className="bg-yellow-900/30 border border-yellow-600 p-3 rounded text-center">
+                                <div className="text-xs font-bold">不安</div>
+                                <div className="text-xs text-gray-400 mt-1">挑戦↑スキル↓</div>
+                            </div>
+                            <div className="bg-green-900/30 border-2 border-green-500 p-3 rounded text-center">
+                                <div className="text-xs font-bold">🌊 フロー</div>
+                                <div className="text-xs text-gray-400 mt-1">挑戦↑スキル↑</div>
+                            </div>
+                            <div className="bg-gray-800/30 border border-gray-600 p-3 rounded text-center">
+                                <div className="text-xs font-bold">無関心</div>
+                                <div className="text-xs text-gray-400 mt-1">挑戦↓スキル↓</div>
+                            </div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded text-center">
+                                <div className="text-xs font-bold">退屈</div>
+                                <div className="text-xs text-gray-400 mt-1">挑戦↓スキル↑</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'mindset') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">マインドセット（ドゥエック）</div>
+                        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                            <div className="bg-gray-800/30 border border-gray-600 p-3 rounded">
+                                <div className="text-sm font-bold text-gray-300 mb-2">固定マインドセット</div>
+                                <div className="text-xs text-gray-400">才能は固定的<br/>失敗を恐れる<br/>挑戦を避ける</div>
+                            </div>
+                            <div className="bg-green-900/30 border-2 border-green-500 p-3 rounded">
+                                <div className="text-sm font-bold text-green-300 mb-2">成長マインドセット</div>
+                                <div className="text-xs text-gray-300">努力で成長<br/>失敗から学ぶ<br/>挑戦を受容</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (type === 'grit') {
+                return (
+                    <div className="flex flex-col items-center p-6">
+                        <div className="text-sm font-bold text-yellow-400 mb-4">グリット = 情熱 × 粘り強さ</div>
+                        <div className="space-y-3 w-full max-w-sm">
+                            <div className="bg-pink-900/30 border border-pink-600 p-3 rounded">
+                                <div className="text-sm font-bold">情熱（Passion）</div>
+                                <div className="text-xs text-gray-300 mt-1">長期目標への一貫した関心</div>
+                            </div>
+                            <div className="text-2xl text-center">×</div>
+                            <div className="bg-blue-900/30 border border-blue-600 p-3 rounded">
+                                <div className="text-sm font-bold">粘り強さ（Perseverance）</div>
+                                <div className="text-xs text-gray-300 mt-1">困難に直面しても努力を継続</div>
+                            </div>
+                            <div className="text-2xl text-center">↓</div>
+                            <div className="bg-green-900/30 border-2 border-green-500 p-3 rounded">
+                                <div className="text-sm font-bold text-center">長期的な成功</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Default fallback
             return <div className="text-gray-500 text-sm p-4 text-center">詳細図解：{type}</div>;
         };
         
