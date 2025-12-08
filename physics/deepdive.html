@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理学図鑑 詳細版 - Physics Deep Dive</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+        .katex { font-size: 1.05em; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide React icons (inline SVG components)
+        const Box = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        );
+        
+        const Maximize = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+        );
+        
+        const Atom = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="1"></circle>
+                <path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path>
+                <path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"></path>
+            </svg>
+        );
+        
+        const Circle = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+        );
+        
+        const Zap = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+        );
+        
+        const ArrowRight = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        );
+        
+        const ArrowLeft = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+        
+        const Home = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+        
+        // ----------------------------------------------------------------------------
+        // DATA STRUCTURE
+        // ----------------------------------------------------------------------------
+        
+        const ERAS = [
+            { id: 'classical', title: '古典力学：秩序の美', period: '1600 - 1900', icon: <Box size={18} /> },
+            { id: 'relativity', title: '相対性理論：時空', period: '1905 - 1915', icon: <Maximize size={18} /> },
+            { id: 'quantum', title: '量子力学：確率の海', period: '1900 - 1950', icon: <Atom size={18} /> },
+            { id: 'particle', title: '素粒子と標準模型', period: '1950 - 1980', icon: <Circle size={18} /> },
+            { id: 'modern', title: '現代：統一への道', period: '1980 - Present', icon: <Zap size={18} /> },
+        ];
+        
+        const PHYSICISTS = {
+            classical: [
+                {
+                    id: 'galileo',
+                    name: 'ガリレオ・ガリレイ',
+                    title: '近代科学の父',
+                    question: '落下する物体の速度は重さによって変わるのか？',
+                    answer: 'いいえ。すべての物体は真空中では同じ加速度で落下する。',
+                    detail: 'イタリア・ピサに生まれたガリレオ（1564-1642）は、数学・天文学・物理学に革命をもたらした。パドヴァ大学で教鞭を執り、実験と数学的記述を重視する近代科学の方法論を確立。1609年に望遠鏡を改良して木星の4つの衛星（ガリレオ衛星：イオ、エウロパ、ガニメデ、カリスト）、金星の満ち欠け、月のクレーターを発見し、地動説を支持する決定的証拠を提供。斜面実験で加速度運動を精密に測定し、自由落下では距離が時間の2乗に比例することを発見（\\\\(s \\\\propto t^2\\\\)）。振り子の等時性を発見。1633年の宗教裁判で有罪とされ終身軟禁。軟禁中も『新科学対話』を著し運動学の基礎を築いた。「それでも地球は動く」は後世の創作。カトリック教会は1992年に誤りを認め名誉回復。慣性の概念を導入し、外力がなければ物体は等速直線運動を続けるという後のニュートンの第1法則の基礎を築いた。',
+                    connection: 'アリストテレス物理学を否定。ニュートンに直接影響。ガリレイ変換はアインシュタインがローレンツ変換に拡張。',
+                    diagramType: 'galileo_experiment',
+                    diagramContent: null
+                },
+                {
+                    id: 'newton',
+                    name: 'アイザック・ニュートン',
+                    title: '古典力学の父',
+                    question: '物体の運動を支配する普遍的な法則は何か？',
+                    answer: '運動の3法則と万有引力の法則だ。天体も地上の物体も同じ法則に従う。',
+                    detail: 'イングランド・ウールスソープに生まれ（1643-1727）、ケンブリッジ大学で学ぶ。1665-66年のペスト流行による大学閉鎖中、故郷で「驚異の年」を過ごし、微積分、光学、万有引力の基礎を築いた。リンゴが木から落ちるのを見て万有引力を着想したという逸話は有名（実話かは不明）。1687年の『自然哲学の数学的諸原理』（プリンキピア）で運動の3法則と万有引力を体系化：第1法則（慣性の法則）外力がなければ物体は等速直線運動、第2法則（運動方程式）\\\\(F = ma\\\\)、第3法則（作用反作用の法則）作用と反作用は大きさが等しく向きが反対。万有引力の法則 \\\\(F = G\\\\frac{m_1 m_2}{r^2}\\\\) ですべての質量間に働く引力を記述し、ケプラーの惑星運動の法則を理論的に導出。月の運動、潮汐、惑星軌道を統一的に説明。微積分（流率法）を発明し、変化する量を数学的に扱う手法を確立。光のプリズム分解実験を行い、白色光が様々な色の光の混合であることを発見。反射望遠鏡を製作。晩年は造幣局長官として贋金対策に尽力し、王立協会会長も務めた。ライプニッツとの微積分発見の優先権争いでも知られる。錬金術研究も熱心に行っていた。',
+                    connection: 'ガリレオとケプラーの統合。アインシュタインが相対論で拡張するまで200年以上支配的。現代でも工学・日常スケールでは高精度で使用される。',
+                    diagramType: 'newton_laws',
+                    diagramContent: null
+                },
+                {
+                    id: 'faraday',
+                    name: 'マイケル・ファラデー',
+                    title: '電磁誘導と場の概念の創始者',
+                    question: '電気と磁気は互いに影響を与え合うのか？',
+                    answer: 'はい。変化する磁場は電場を生み、その逆も成り立つ（電磁誘導）。',
+                    detail: 'イングランドの貧しい鍛冶屋の息子として生まれ（1791-1867）、独学で科学者となった。1831年に電磁誘導の法則を発見：変化する磁場が電流を誘起する。これは発電機とトランスの原理。電気分解の法則を発見し、電気化学に貢献。「場」の概念を導入し、力は離れた場所に直接作用するのではなく、空間に満ちる場を通じて伝わると考えた。これはニュートンの遠隔作用の概念を覆す革命的なアイデアで、マクスウェルが数学的に定式化した。ベンゼンを発見するなど化学にも貢献。王立研究所でクリスマスレクチャーを行い、科学の大衆化に尽力。正規の教育を受けていないため数学が苦手だったが、直感的な物理的洞察力は並外れていた。',
+                    connection: 'エルステッドとアンペールの研究を発展。マクスウェルが数学的に完成させた。現代の電力・通信技術の基礎。',
+                    diagramType: 'em_induction',
+                    diagramContent: null
+                },
+                {
+                    id: 'maxwell',
+                    name: 'ジェームズ・クラーク・マクスウェル',
+                    title: '電磁気学の統一者',
+                    question: '電気と磁気の本質は何か？',
+                    answer: '電磁場であり、光は電磁波だ。',
+                    detail: 'スコットランド・エディンバラ生まれ（1831-1879）。ケンブリッジ大学で学び、わずか48年の生涯で物理学に多大な貢献。1865年にマクスウェル方程式を発表し、電気と磁気を統一。4つの方程式：ガウスの法則（電場）、磁場のガウスの法則（磁気単極子は存在しない）、ファラデーの電磁誘導の法則、アンペール・マクスウェルの法則。これらから光が電磁波であることを理論的に予言（実験的にはヘルツが1887年に検証）。電磁波の速度が光速と一致することを計算で示した。土星の環が固体ではなく多数の小さな粒子から成ることを証明。気体分子運動論を発展させ、マクスウェル分布を導出。熱力学にも貢献し、「マクスウェルの悪魔」という思考実験で熱力学第二法則の本質に迫った。色覚理論を発展させ、世界初のカラー写真を撮影。相対性理論と量子論の先駆けとなった。アインシュタインはマクスウェルを最も尊敬する物理学者の一人とした。',
+                    connection: 'ファラデーの場の概念を数学的に定式化。アインシュタインの特殊相対論の出発点。量子電磁力学の古典的基礎。',
+                    diagramType: 'em_wave',
+                    diagramContent: null
+                },
+                {
+                    id: 'carnot',
+                    name: 'ニコラ・レオナール・サディ・カルノー',
+                    title: '熱機関と熱力学の先駆者',
+                    question: '熱機関の効率はどこまで高められるのか？',
+                    answer: '理論的な最大効率（カルノー効率）が存在し、それは作動する温度差のみで決まる。',
+                    detail: 'フランス・パリ生まれ（1796-1832）、わずか36歳で亡くなったが熱力学の基礎を築いた。1824年の著書『火の動力について』で理想的な熱機関（カルノーサイクル）を考察。カルノーサイクルは2つの等温過程と2つの断熱過程から成り、その効率 \\\\(\\\\eta = 1 - \\\\frac{T_C}{T_H}\\\\) は高温熱源温度 \\\\(T_H\\\\) と低温熱源温度 \\\\(T_C\\\\) のみで決まることを示した。これは熱力学第二法則の先駆的な洞察。当時は熱素説が支配的で、熱が物質だと考えられていたが、カルノーは熱機関の本質を正しく捉えた。コレラで早世し、感染を恐れて彼の遺品の多くが焼却されてしまった。彼の業績はクラウジウスとケルヴィン（トムソン）によって再発見・発展された。',
+                    connection: 'クラウジウスとケルヴィンが熱力学を体系化する基礎。内燃機関や冷凍機の理論的限界を示す。',
+                    diagramType: 'carnot_cycle',
+                    diagramContent: null
+                },
+                {
+                    id: 'kelvin',
+                    name: 'ケルヴィン卿（ウィリアム・トムソン）',
+                    title: '熱力学と絶対温度',
+                    question: '温度の下限は存在するのか？',
+                    answer: 'はい。絶対零度（-273.15°C、0K）が温度の下限だ。',
+                    detail: '北アイルランド・ベルファスト生まれ（1824-1907）。ケンブリッジ大学で学び、グラスゴー大学で53年間教授を務めた。1848年に絶対温度目盛（ケルビン温度）を提案。カルノーの研究を発展させ、クラウジウスとともに熱力学第一法則（エネルギー保存則）と第二法則（エントロピー増大則）を定式化。ジュール・トムソン効果を発見し、気体の膨張冷却を説明。大西洋横断海底ケーブル敷設に貢献し、電信技術を改良。地球の年齢を熱力学的に計算したが、放射性崩壊を知らなかったため実際より大幅に若く見積もった（2000万〜4億年、実際は45億年）。流体力学、電磁気学、地球物理学など幅広い分野に貢献。業績を称えられナイトの称号を受け、ケルヴィン卿と呼ばれるようになった。',
+                    connection: 'カルノーの理論を発展。統計力学とボルツマンに影響。極低温物理学の基礎。',
+                    diagramType: 'absolute_temperature',
+                    diagramContent: null
+                },
+                {
+                    id: 'boltzmann',
+                    name: 'ルートヴィヒ・ボルツマン',
+                    title: '統計力学の創始者',
+                    question: '熱とは何か？エントロピーの本質は？',
+                    answer: '熱は分子の無秩序な運動だ。エントロピーは確率の対数、\\\\(S = k \\\\log W\\\\)。',
+                    detail: 'オーストリア・ウィーン生まれ（1844-1906）。マクロな熱現象をミクロな分子運動から説明する統計力学を確立。ボルツマン方程式で気体分子の分布関数の時間発展を記述。エントロピー公式 \\\\(S = k \\\\log W\\\\)（Wは状態の数、kはボルツマン定数）で熱力学第二法則に統計的解釈を与えた。これは熱力学と力学を橋渡しする画期的な成果。しかし当時、原子・分子の実在を疑う科学者も多く（マッハやオストヴァルトなど）、ボルツマンは激しい論争に巻き込まれた。晩年は鬱病に苦しみ、1906年にイタリア・ドゥイーノで自殺。その直後、ペランの実験でアインシュタインのブラウン運動理論が検証され、原子の実在が確立された。墓石には \\\\(S = k \\\\log W\\\\) が刻まれている。',
+                    connection: '量子統計力学の基礎。プランクの黒体放射理論に影響。情報理論のシャノンエントロピーの先駆け。',
+                    diagramType: 'entropy',
+                    diagramContent: null
+                }
+            ],
+            relativity: [
+                {
+                    id: 'einstein_special',
+                    name: 'アルベルト・アインシュタイン（特殊相対論）',
+                    title: '時空の革命家',
+                    question: '光速は観測者によって変わるのか？',
+                    answer: 'いいえ。光速cは不変で、時間と空間が相対的になる。',
+                    detail: 'ドイツ・ウルム生まれ（1879-1955）。スイス・ベルン特許局の技術専門員だった1905年に「奇跡の年」を迎え、光量子仮説（光電効果）、ブラウン運動の理論、特殊相対性理論を発表。特殊相対論は2つの原理から出発：(1)慣性系では物理法則は同じ、(2)光速cは観測者によらず不変。これらから驚くべき結果が導かれる：時間の遅れ（動く時計は遅れる）、ローレンツ収縮（動く物体は縮む）、同時性の相対性（同時は絶対的でない）、質量とエネルギーの等価性 \\\\(E = mc^2\\\\)。ニュートンの絶対時間・絶対空間を否定し、時空は一体の4次元時空として扱われる。ローレンツ変換 \\\\(t\' = \\\\gamma(t - vx/c^2), x\' = \\\\gamma(x - vt)\\\\) where \\\\(\\\\gamma = 1/\\\\sqrt{1-v^2/c^2}\\\\)。マクスウェル方程式がローレンツ変換で不変であることを示した。特殊相対論は高エネルギー物理学、加速器、GPS衛星で実証され、現代物理学の基礎。',
+                    connection: 'マクスウェル方程式が光速不変を要請。ミンコフスキーが4次元時空で定式化。量子力学と結合してディラック方程式へ。',
+                    diagramType: 'special_relativity',
+                    diagramContent: null
+                },
+                {
+                    id: 'einstein_general',
+                    name: 'アルベルト・アインシュタイン（一般相対論）',
+                    title: '重力の幾何学者',
+                    question: '重力とは何か？',
+                    answer: '時空の歪みだ。質量が時空を曲げ、その曲がりが重力として現れる。',
+                    detail: '特殊相対論は加速系を扱えない。1907年、自由落下するエレベーター内では重力を感じないという「最も幸福な思いつき」（等価原理）から、加速度と重力は区別できないことに気づく。1915年、10年の苦闘の末、リーマン幾何学を用いて一般相対性理論を完成。アインシュタイン方程式 \\\\(G_{\\\\mu\\\\nu} = \\\\frac{8\\\\pi G}{c^4} T_{\\\\mu\\\\nu}\\\\) は時空の曲がり（左辺）と物質・エネルギー（右辺）を結びつける。重力はニュートンの「力」ではなく、時空の幾何学的な曲がり。予言：水星の近日点移動（観測と一致）、重力による光の曲がり（1919年の日食観測で確認、アインシュタインを一躍有名に）、重力赤方偏移、ブラックホール、重力波（2015年 LIGO が初検出）、宇宙の膨張（ハッブルが観測）。アインシュタインは静的宇宙を信じ宇宙項Λを導入したが、後に「人生最大の過ち」と言った（しかし現在、暗黒エネルギーとして復活）。',
+                    connection: 'リーマン幾何学を物理学に応用。現代宇宙論の基礎。ブラックホール物理学、重力波天文学へ。量子論との統一（量子重力）は未解決。',
+                    diagramType: 'spacetime_curvature',
+                    diagramContent: null
+                }
+            ],
+            quantum: [
+                {
+                    id: 'planck',
+                    name: 'マックス・プランク',
+                    title: '量子論の父',
+                    question: '黒体放射のスペクトルはなぜ観測と理論で合わないのか？',
+                    answer: 'エネルギーが連続的ではなく、\\\\(E = h\\\\nu\\\\)の離散的な単位（量子）で放出・吸収されるからだ。',
+                    detail: 'ドイツ・キール生まれ（1858-1947）。1900年12月14日、黒体放射のスペクトルを説明するため、エネルギーが離散的な単位でのみ交換されると仮定。プランクの公式 \\\\(u(\\\\nu,T) = \\\\frac{8\\\\pi h\\\\nu^3}{c^3} \\\\frac{1}{e^{h\\\\nu/k_BT}-1}\\\\) で紫外破綻（古典論の予言する無限大のエネルギー）を解決。プランク定数 \\\\(h \\\\approx 6.626 \\\\times 10^{-34}\\\\) J·s を導入し、量子論の幕開けとなった。しかしプランク自身は当初、これを数学的なトリックと考えていた。アインシュタインが光量子仮説（1905年）でプランクの量子化を光そのものに適用し、ボーアが原子に応用（1913年）して、量子論が確立していった。プランクはナチスドイツ下でも科学界に留まり苦悩した。息子がヒトラー暗殺計画に関与し処刑される悲劇にも見舞われた。1918年ノーベル物理学賞受賞。',
+                    connection: '量子論の創始。アインシュタインの光量子、ボーアの原子模型、ハイゼンベルクとシュレーディンガーの量子力学へと発展。',
+                    diagramType: 'blackbody_radiation',
+                    diagramContent: null
+                },
+                {
+                    id: 'bohr',
+                    name: 'ニールス・ボーア',
+                    title: '量子論の先駆者',
+                    question: '原子はどうして安定なのか？古典論では電子は軌道から落ちるはずだが。',
+                    answer: '電子は特定の軌道（エネルギー準位）しか取れず、その間の遷移で光を放出・吸収する。',
+                    detail: 'デンマーク・コペンハーゲン生まれ（1885-1962）。1913年、ラザフォードの原子核模型（原子核の周りを電子が回る）に量子化の条件を導入したボーア模型を提唱。角運動量が \\\\(L = n\\\\hbar\\\\)（nは整数、\\\\(\\\\hbar = h/2\\\\pi\\\\)）に量子化されると仮定し、水素原子のスペクトル線（バルマー系列など）を正確に説明。エネルギー準位 \\\\(E_n = -\\\\frac{13.6 \\\\text{ eV}}{n^2}\\\\)。しかしボーア模型は水素原子にしか適用できず、多電子原子やスペクトルの微細構造は説明できなかった。1925-26年にハイゼンベルクとシュレーディンガーが量子力学を完成させると、ボーアは哲学的解釈（コペンハーゲン解釈）で中心的役割。波動と粒子の相補性原理を提唱。アインシュタインとの論争（EPRパラドックス、1935年）は量子力学の本質を巡る歴史的議論。第二次大戦中、ナチスドイツから逃れスウェーデン経由でアメリカへ。マンハッタン計画に参加したが、戦後は核兵器の国際管理を主張。1922年ノーベル物理学賞受賞。息子アーゲ・ボーアも1975年にノーベル賞。',
+                    connection: 'プランクとアインシュタインの量子化を原子に適用。ハイゼンベルク、シュレーディンガーの量子力学へ。',
+                    diagramType: 'bohr_model',
+                    diagramContent: null
+                },
+                {
+                    id: 'heisenberg',
+                    name: 'ヴェルナー・ハイゼンベルク',
+                    title: '不確定性原理と行列力学',
+                    question: '位置と運動量は同時に正確に測定できるのか？',
+                    answer: 'いいえ。\\\\(\\\\Delta x \\\\Delta p \\\\geq \\\\hbar/2\\\\)の不確定性関係が成り立つ。',
+                    detail: 'ドイツ・ヴュルツブルク生まれ（1901-1976）。1925年、ヘルゴラント島で療養中に行列力学を着想。観測可能な量（スペクトル線の振動数と強度）のみを用いて量子論を定式化。ボルン、ヨルダンとともに行列力学を完成させた。1927年、不確定性原理を発表：位置と運動量は同時に正確には測定できず \\\\(\\\\Delta x \\\\Delta p \\\\geq \\\\hbar/2\\\\)、時間とエネルギーも \\\\(\\\\Delta E \\\\Delta t \\\\geq \\\\hbar/2\\\\)。これは測定の不完全さではなく、自然の根本的な性質。シュレーディンガーの波動力学と数学的に等価であることが証明された。1932年ノーベル物理学賞受賞（当時31歳）。第二次大戦中、ナチスドイツの原爆開発（ウラン計画）の中心的存在だったが、結局完成しなかった。戦後は西ドイツの科学政策に尽力。',
+                    connection: 'ボーアの量子論を数学的に定式化。シュレーディンガーと独立に量子力学を完成。現代の量子情報理論の基礎。',
+                    diagramType: 'uncertainty_principle',
+                    diagramContent: null
+                },
+                {
+                    id: 'dirac',
+                    name: 'ポール・ディラック',
+                    title: 'ディラック方程式と反物質の予言',
+                    question: '量子力学と特殊相対論を統合できるか？',
+                    answer: 'できる。ディラック方程式が相対論的な電子を記述し、反物質を予言する。',
+                    detail: 'イギリス・ブリストル生まれ（1902-1984）。1928年、シュレーディンガー方程式を相対論化したディラック方程式を発表：\\\\(i\\\\hbar \\\\frac{\\\\partial \\\\psi}{\\\\partial t} = (c\\\\boldsymbol{\\\\alpha}\\\\cdot\\\\boldsymbol{p} + \\\\beta mc^2)\\\\psi\\\\)。これは電子のスピン 1/2 を自然に導き、負のエネルギー解を持つ。ディラックはこれを反粒子（陽電子）の存在として解釈。1932年、アンダーソンが霧箱実験で陽電子を発見し、ディラックの予言が実証された。これは反物質の発見であり、現代の素粒子物理学の出発点。フェルミ統計とボース統計を統一的に扱う量子統計力学にも貢献。デルタ関数（ディラックのδ関数）を導入し、数学にも影響。極度に寡黙で知られ、ボーアとの会話で長い沈黙があったという逸話も。1933年ノーベル物理学賞受賞（シュレーディンガーと共同受賞）。晩年は大統一理論に興味を持った。',
+                    connection: '量子力学と特殊相対論の統合。場の量子論へ。反物質の予言は対称性の破れの研究に発展。',
+                    diagramType: 'dirac_equation',
+                    diagramContent: null
+                },
+                {
+                    id: 'pauli',
+                    name: 'ヴォルフガング・パウリ',
+                    title: 'パウリの排他原理',
+                    question: '電子はなぜ同じ状態に複数入れないのか？',
+                    answer: 'パウリの排他原理：2つのフェルミ粒子は同じ量子状態を占められない。',
+                    detail: 'オーストリア・ウィーン生まれ（1900-1958）。ゴッドファーザーはエルンスト・マッハ。1925年、パウリの排他原理を発表：2つのフェルミ粒子（電子など、スピンが半整数）は同一の量子状態を占めることができない。これが元素の周期表、化学結合、物質の安定性を説明する。電子のスピンを導入（ゴウトスミットとウーレンベックが独立に提案）。1930年、ベータ崩壊のエネルギー保存則を説明するため、観測されない中性の粒子（ニュートリノ）の存在を提案（「絶望的な解決策」と自嘲）。フェルミが理論化し、1956年に実験的に検出された。批判精神が強く、「パウリ効果」（彼が近づくと実験装置が壊れる）という冗談も。ユングと親交があり、夢の分析を受けた。1945年ノーベル物理学賞受賞。',
+                    connection: '周期表の量子論的説明。フェルミ統計の基礎。ニュートリノ物理学の出発点。',
+                    diagramType: 'pauli_exclusion',
+                    diagramContent: null
+                },
+                {
+                    id: 'born',
+                    name: 'マックス・ボルン',
+                    title: '波動関数の確率解釈',
+                    question: '波動関数\\\\(\\\\psi\\\\)の物理的意味は何か？',
+                    answer: '\\\\(|\\\\psi|^2\\\\)が粒子を見つける確率密度だ。',
+                    detail: 'ドイツ・ブレスラウ生まれ（1882-1970）。ゲッティンゲン大学教授として、ハイゼンベルク、パウリ、フェルミ、オッペンハイマーら多くの物理学者を育てた。1926年、シュレーディンガー方程式の波動関数に確率解釈を与えた：\\\\(|\\\\psi(\\\\boldsymbol{r},t)|^2\\\\) が位置 \\\\(\\\\boldsymbol{r}\\\\) で粒子を見つける確率密度。これは量子力学が本質的に確率的であることを意味し、アインシュタインは生涯受け入れなかった（「神はサイコロを振らない」）。ボルンは「神はサイコロを振り、どこに転がすか決めている」と返答。行列力学の定式化にも貢献。ボルン・オッペンハイマー近似（分子中の電子と原子核の運動を分離）は量子化学の基礎。ナチスから逃れイギリスへ亡命。1954年ノーベル物理学賞受賞（確率解釈に対して、遅い受賞だった）。孫娘はオリヴィア・ニュートン=ジョン（歌手・女優）。',
+                    connection: 'コペンハーゲン解釈の数学的基礎。量子測定理論へ。',
+                    diagramType: 'probability_interpretation',
+                    diagramContent: null
+                },
+                {
+                    id: 'schrodinger',
+                    name: 'エルヴィン・シュレーディンガー',
+                    title: '波動力学の創始者',
+                    question: '電子は粒子か波か？どう数学的に記述するのか？',
+                    answer: '波動と粒子の二重性を持つ。波動関数\\\\(\\\\psi\\\\)が時間発展を記述する。',
+                    detail: 'オーストリア・ウィーン生まれ（1887-1961）。1926年、ド・ブロイの物質波のアイデアを発展させ、シュレーディンガー方程式を発表：\\\\(i\\\\hbar \\\\frac{\\\\partial \\\\psi}{\\\\partial t} = \\\\hat{H}\\\\psi\\\\)（時間依存）、\\\\(\\\\hat{H}\\\\psi = E\\\\psi\\\\)（時間独立、固有値方程式）。水素原子のエネルギー準位を波動方程式から導出し、ボーア模型の量子化条件が自然に現れることを示した。ハイゼンベルクの行列力学と数学的に等価であることが証明された。波動力学の方が直感的で、化学者にも受け入れられやすかった。1935年、量子力学の測定問題を指摘する「シュレーディンガーの猫」の思考実験を提案：猫が生きている状態と死んでいる状態の重ね合わせになるという奇妙な帰結。これは現代の量子情報理論でも議論される。ナチスから逃れダブリン高等研究所へ。晩年は生命現象の物理学に興味を持ち『生命とは何か』を著し、DNAの二重らせん発見に影響を与えた。1933年ノーベル物理学賞受賞（ディラックと共同受賞）。',
+                    connection: 'ド・ブロイの物質波を定式化。量子化学、凝縮系物理学の基礎。シュレーディンガーの猫は量子測定理論、デコヒーレンス理論へ。',
+                    diagramType: 'wave_function',
+                    diagramContent: null
+                }
+            ],
+            particle: [
+                {
+                    id: 'feynman',
+                    name: 'リチャード・ファインマン',
+                    title: '量子電磁力学の巨匠',
+                    question: '光と物質はどう相互作用するか？無限大の発散をどう処理するのか？',
+                    answer: '仮想光子を交換し、繰り込み理論で発散を除去する。ファインマン図で視覚化できる。',
+                    detail: 'アメリカ・ニューヨーク生まれ（1918-1988）。MIT、プリンストンで学び、マンハッタン計画に参加。1948年、シュウィンガー、朝永振一郎と独立に量子電磁力学（QED）を完成させた。ファインマン図：粒子の相互作用を時空図として視覚化する手法を開発。電子が光子を放出・吸収し、これが電磁相互作用を媒介する。仮想粒子の概念を導入。経路積分の定式化：粒子はあらゆる可能な経路を通り、各経路に位相を割り当てて足し合わせる。これはシュレーディンガー方程式と等価だが、より直感的で、場の量子論や統計力学に広く応用される。パートン模型で陽子内部のクォーク構造を予言。繰り込み理論で理論の無限大を系統的に除去。1965年ノーベル物理学賞受賞（シュウィンガー、朝永と共同受賞）。『ファインマン物理学』は名講義録。ボンゴを演奏し、金庫破りの腕前もあった。チャレンジャー号事故調査でOリングの問題を公開実験で示した。',
+                    connection: 'ディラックの場の量子論を発展。標準模型の構築に不可欠。弦理論の経路積分定式化にも影響。',
+                    diagramType: 'feynman_diagram',
+                    diagramContent: null
+                },
+                {
+                    id: 'gellmann',
+                    name: 'マレー・ゲルマン',
+                    title: 'クォーク模型と八道説',
+                    question: '陽子や中性子はさらに小さな粒子から成るのか？',
+                    answer: 'はい。クォークという素粒子から成る。',
+                    detail: 'アメリカ・ニューヨーク生まれ（1929-2019）。1953年、ストレンジネスという量子数を導入してハドロン（強い相互作用する粒子）を分類。1961年、八道説（Eight-fold Way）を提案：ハドロンをSU(3)対称性で分類し、未発見の粒子（Ω粒子）を予言。1964年に発見され大成功。1964年、ツヴァイクと独立にクォーク模型を提案：ハドロンはクォークという基本粒子から成る。3つのフレーバー（up, down, strange）と3つの色荷（赤、青、緑）を導入。陽子は uud、中性子は udd から成る。当初、クォークは数学的なツールと考えられたが、深非弾性散乱実験（1968年、スタンフォード）で実在が確認された。色荷は強い相互作用の荷で、量子色力学（QCD）の基礎。1969年ノーベル物理学賞受賞。複雑系や言語学にも興味を持ち、サンタフェ研究所を共同設立。',
+                    connection: '素粒子の分類。量子色力学へ。標準模型の一部。',
+                    diagramType: 'quark_model',
+                    diagramContent: null
+                },
+                {
+                    id: 'higgs',
+                    name: 'ピーター・ヒッグス',
+                    title: 'ヒッグス機構と質量の起源',
+                    question: '素粒子はなぜ質量を持つのか？',
+                    answer: 'ヒッグス場との相互作用で質量を獲得する。',
+                    detail: 'イギリス・ニューカッスル生まれ（1929-2024）。1964年、ヒッグス機構を提案（アングレール、ブラウト、グラルニック、ハーゲン、キッブルも独立に発見）。ゲージ対称性の自発的破れにより、ゲージボソンが質量を獲得する仕組み。宇宙全体にヒッグス場が満ちており、素粒子がヒッグス場と相互作用することで質量を得る。W・Zボソンの質量を説明し、電弱統一理論を完成させた。ヒッグス場の励起がヒッグス粒子（ヒッグスボソン）。2012年7月4日、CERNのLHC（大型ハドロン衝突型加速器）でヒッグス粒子が発見され、約48年越しの予言が実証された。質量125 GeV/c²。これは標準模型の最後のピース。2013年ノーベル物理学賞受賞（アングレールと共同受賞）。控えめな性格で「ヒッグス粒子」という名称を好まず「スカラー粒子」と呼んでいた。',
+                    connection: '電弱統一理論の完成。標準模型の基礎。暗黒物質との関連も研究される。',
+                    diagramType: 'higgs_mechanism',
+                    diagramContent: null
+                },
+                {
+                    id: 'nambu',
+                    name: '南部陽一郎',
+                    title: '自発的対称性の破れ',
+                    question: '対称性が破れるとはどういうことか？',
+                    answer: '基本法則は対称だが、真空状態が対称性を持たない（自発的対称性の破れ）。',
+                    detail: '日本・東京生まれ（1921-2015）、アメリカで活躍。1960年、自発的対称性の破れの概念を素粒子物理学に導入。超伝導のBCS理論（電子対形成）を素粒子に応用し、カイラル対称性の破れを説明。これはヒッグス機構の先駆け。弦理論の創始者の一人：ハドロンを記述するモデルとして1次元の弦を提案（1970年）。後に重力を含む統一理論として発展。QCD（量子色力学）の色荷の概念を提案。南部・ゴールドストーンボソン：対称性が自発的に破れると質量ゼロの粒子（ゴールドストーンボソン）が現れる（南部・ゴールドストーンの定理）。2008年ノーベル物理学賞受賞（87歳、当時最高齢受賞）。控えめで「僕の仕事は皆が使っているから満足」と語った。',
+                    connection: 'ヒッグス機構の基礎。弦理論の創始。標準模型の理論的枠組み。',
+                    diagramType: 'symmetry_breaking',
+                    diagramContent: null
+                },
+                {
+                    id: 'kobayashi_maskawa',
+                    name: '小林誠・益川敏英',
+                    title: 'CP対称性の破れと6つのクォーク',
+                    question: 'なぜ宇宙は物質で満ちているのか（反物質はどこへ？）',
+                    answer: 'CP対称性の破れにより、物質と反物質の量が異なる。6つのクォークで説明できる。',
+                    detail: '1973年、小林誠（1944-、愛知生まれ）と益川敏英（1940-2021、名古屋生まれ）が共同研究でCP対称性の破れを説明するため、第3世代のクォーク（top, bottom）の存在を予言。当時は3世代（charm, strange, down, up）しか知られていなかったが、6つのクォークがあればCP対称性の破れを説明できることを示した。CKM行列（カビボ・小林・益川行列）でクォークの世代間混合を記述。1977年にボトムクォーク、1995年にトップクォークが発見され、理論が実証された。CP対称性の破れは、ビッグバン後に物質が反物質より多く残った理由（バリオン数非対称性）を説明する鍵。これがなければ宇宙は光だけになり、我々は存在しなかった。2008年ノーベル物理学賞受賞（南部陽一郎と同時受賞）。益川は「英語ができなくても大丈夫」というメッセージで有名。',
+                    connection: '標準模型の完成。宇宙の物質・反物質非対称の説明。B中間子工場実験（Belle, BaBar）で検証。',
+                    diagramType: 'cp_violation',
+                    diagramContent: null
+                }
+            ],
+            modern: [
+                {
+                    id: 'penrose',
+                    name: 'ロジャー・ペンローズ',
+                    title: '特異点定理とツイスター理論',
+                    question: 'ブラックホールの中心で何が起きているのか？',
+                    answer: '一般相対論によれば、特異点（無限大の密度）が不可避的に形成される。',
+                    detail: 'イギリス・コルチェスター生まれ（1931-）。1965年、ホーキングに先立ち特異点定理を証明：一般相対論において、重力崩壊が起きると特異点の形成が不可避。これはアインシュタイン方程式が破綻する点であり、量子重力理論の必要性を示す。ペンローズ・ホーキングの特異点定理（1970年）でビッグバン特異点の存在も示した。ペンローズ図（時空の因果構造を表す図）を開発。ツイスター理論：複素幾何学を用いて時空を記述する新しいアプローチ。ペンローズ・タイリング：非周期的に平面を埋め尽くすタイル。準結晶の発見につながった。意識と量子力学の関係を論じ、「意識は量子重力現象」という仮説（Orch OR理論）を提唱（議論の的）。2020年ノーベル物理学賞受賞（ブラックホール研究に対して、89歳）。父は著名な遺伝学者、弟は国際的なチェスプレーヤー。',
+                    connection: 'ブラックホール物理学の基礎。量子重力の必要性を明示。数理物理学に多大な影響。',
+                    diagramType: 'penrose_diagram',
+                    diagramContent: null
+                },
+                {
+                    id: 'hawking',
+                    name: 'スティーヴン・ホーキング',
+                    title: 'ブラックホールの熱力学',
+                    question: 'ブラックホールは永遠に黒いのか？',
+                    answer: 'いいえ。量子効果で熱放射し、最終的には蒸発する（ホーキング放射）。',
+                    detail: 'イギリス・オックスフォード生まれ（1942-2018）。ケンブリッジ大学で学び、21歳でALS（筋萎縮性側索硬化症）と診断された。余命2年と宣告されたが、76歳まで生きた。1970年、ペンローズとともに特異点定理を完成させ、ビッグバンとブラックホールで特異点が不可避であることを証明。1974年、量子効果を考慮するとブラックホールが熱放射（ホーキング放射）することを発見。温度は \\\\(T = \\\\frac{\\\\hbar c^3}{8\\\\pi G M k_B}\\\\)、質量に反比例。小さいブラックホールほど高温で速く蒸発。ブラックホール熱力学の4法則を定式化。ブラックホール情報パラドックス：ホーキング放射で情報は失われるのか？量子力学と一般相対論の矛盾を示す。1988年『ホーキング、宇宙を語る』が大ベストセラー（1000万部以上）。車椅子と音声合成装置を使いながら研究・講演を続けた。宇宙論にも貢献し、無境界仮説（ハートル・ホーキング状態）を提案。',
+                    connection: 'アインシュタインの一般相対論と量子論の統合に挑戦。弦理論とホログラフィック原理に影響。',
+                    diagramType: 'black_hole',
+                    diagramContent: null
+                },
+                {
+                    id: 'witten',
+                    name: 'エドワード・ウィッテン',
+                    title: 'M理論と数理物理学',
+                    question: '5つの超弦理論はどう統一されるのか？',
+                    answer: 'M理論が5つの弦理論を統一する11次元理論だ。',
+                    detail: 'アメリカ・ボルティモア生まれ（1951-）。歴史学を専攻後、物理学に転向。1995年、第2次超弦理論革命を主導。5つの異なる超弦理論（Type I, IIA, IIB, Heterotic SO(32), E8×E8）が実は双対性でつながっており、11次元のM理論として統一されることを示した。M理論のMは「膜（Membrane）」「神秘（Mystery）」「母（Mother）」など諸説。トポロジカル場の量子論、ゲージ理論と弦理論の双対性（AdS/CFT対応の基礎）、結び目理論と量子場理論の関係など、数学と物理学の深い関係を明らかにした。フィールズ賞受賞（1990年、物理学者として初めて）。ハーバード、プリンストン高等研究所で活躍。超弦理論の第一人者であり、「生きている最も偉大な理論物理学者」と評される。',
+                    connection: '超弦理論の統一。量子重力の有力候補。AdS/CFT対応でゲージ重力対応を示唆。',
+                    diagramType: 'm_theory',
+                    diagramContent: null
+                },
+                {
+                    id: 'susskind',
+                    name: 'レナード・サスキンド',
+                    title: 'ホログラフィック原理',
+                    question: 'ブラックホールの情報はどこに保存されるのか？',
+                    answer: '事象の地平面という2次元表面に、3次元の情報がすべて符号化される（ホログラフィック原理）。',
+                    detail: 'アメリカ・ニューヨーク生まれ（1940-）。スタンフォード大学教授。1969年、ゲルマンと独立にクォーク模型の色荷を提案。1970年代、南部とともに弦理論の創始に貢献。1990年代、ホログラフィック原理を提唱（トホーフトのアイデアを発展）：3次元空間の物理現象は2次元境界面の情報で完全に記述できる。ブラックホールのエントロピーが表面積に比例することから着想。マルダセナのAdS/CFT対応（1997年）で具体的に実現された。ホーキングとのブラックホール情報戦争：ホーキングは情報が失われると主張、サスキンドは保存されると主張。最終的にホーキングが譲歩（2004年）。弦理論のランドスケープ問題を提唱：10^500個もの真空状態があり、人間原理で我々の宇宙を説明すべきか？「理論的最小限」シリーズで一般向け教育に貢献。',
+                    connection: 'ブラックホール情報問題の解決。AdS/CFT対応の解釈。量子情報と重力の関係。',
+                    diagramType: 'holographic_principle',
+                    diagramContent: null
+                },
+                {
+                    id: 'thorne',
+                    name: 'キップ・ソーン',
+                    title: '重力波の検出',
+                    question: 'アインシュタインが予言した重力波は実在するのか？',
+                    answer: 'はい。2015年にLIGOで初めて直接検出された。',
+                    detail: 'アメリカ・ローガン生まれ（1940-）。カリフェルニア工科大学（Caltech）でジョン・ホイーラーに師事。重力波検出プロジェクトLIGO（レーザー干渉計重力波観測所）の創設者の一人。1970年代から重力波検出の技術開発を主導し、40年以上にわたる努力の末、2015年9月14日、ついに重力波の初検出に成功。13億光年彼方のブラックホール連星の合体からの信号をとらえた。これはアインシュタインの一般相対論の最後の予言の実証であり、新しい天文学（重力波天文学）の幕開け。2017年ノーベル物理学賞受賞（ワイス、バリッシュと共同受賞）。ブラックホール物理学にも貢献し、映画『インターステラー』の科学顧問として、視覚的に正確なブラックホール描画を実現。ワームホールとタイムマシンの理論研究でも知られる（実現可能性は不明）。',
+                    connection: 'アインシュタインの予言を実証。重力波天文学の創始。ブラックホール、中性子星の新しい観測手段。',
+                    diagramType: 'gravitational_waves',
+                    diagramContent: null
+                },
+                {
+                    id: 'string',
+                    name: '超弦理論・M理論',
+                    title: '究極の統一理論？',
+                    question: '重力と量子論を統一できるか？すべての力と物質を単一の理論で記述できるか？',
+                    answer: '粒子は0次元の点ではなく1次元の「ひも（弦）」だとすれば可能。M理論で5つの弦理論が統一される。',
+                    detail: '1970年代、南部陽一郎らが強い相互作用を記述するモデルとして弦理論を提案（後にQCDに置き換えられる）。1984年、シュワルツとグリーンが超弦理論の無矛盾性を証明し、第1次革命。素粒子を点ではなく長さ \\\\(10^{-35}\\\\) m（プランクスケール）の1次元の弦として扱う。弦の振動モードが異なる素粒子に対応。閉じた弦の振動はグラビトン（重力子）となり、重力が自然に含まれる。超対称性を持つ超弦理論は10次元時空を要求し、余剰次元はコンパクト化される。5つの超弦理論（Type I, IIA, IIB, Heterotic SO(32), E8×E8）が発見されたが、1995年、ウィッテンが11次元のM理論で統一（第2次革命）。M理論では弦だけでなく膜（ブレーン）も基本的対象。AdS/CFT対応（マルダセナ、1997年）：重力理論とゲージ理論が双対。ランドスケープ問題：10^500個もの真空状態が存在し、どれが我々の宇宙かわからない。実験的検証が困難（プランクスケール）で、「数学として美しいが物理学か？」という批判も。競合理論としてループ量子重力がある。',
+                    connection: '量子重力の最有力候補。数理物理学に多大な影響。ブラックホール情報問題、ホログラフィック原理と関連。',
+                    diagramType: 'string_theory',
+                    diagramContent: null
+                }
+            ]
+        };
+        
+        // ----------------------------------------------------------------------------
+        // DIAGRAM BUILDER
+        // ----------------------------------------------------------------------------
+        
+        const DiagramBuilder = ({ type, content }) => {
+            if (type === 'newton_laws') {
+                return (
+                    <div className="flex flex-col gap-2 p-4">
+                        <div className="bg-purple-900 p-3 rounded text-sm">1. 慣性の法則</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm">2. F = ma</div>
+                        <div className="bg-purple-900 p-3 rounded text-sm">3. 作用反作用</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'em_wave') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">〰️</div>
+                        <div className="text-lg font-bold text-blue-400">電磁波</div>
+                        <div className="text-xs text-gray-400 mt-2">E⊥B, 光速c</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'entropy') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-yellow-500 mb-2">S = k log W</div>
+                        <div className="text-sm text-gray-400">エントロピー＝乱雑さ</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'special_relativity') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-cyan-400 mb-2">E = mc²</div>
+                        <div className="text-xs text-gray-400 mt-2">時間の遅れ・長さの収縮</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'spacetime_curvature') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-40 h-24">
+                            <svg viewBox="0 0 160 100" className="w-full h-full">
+                                <path d="M 10,30 Q 80,60 150,30" stroke="#8b5cf6" strokeWidth="2" fill="none" />
+                                <path d="M 10,50 Q 80,80 150,50" stroke="#8b5cf6" strokeWidth="2" fill="none" />
+                                <circle cx="80" cy="65" r="8" fill="#ef4444" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">質量が時空を曲げる</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'bohr_model') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-32 h-32">
+                            <div className="absolute inset-0 border-2 border-blue-500 rounded-full"></div>
+                            <div className="absolute inset-4 border-2 border-blue-400 rounded-full"></div>
+                            <div className="absolute inset-8 border-2 border-blue-300 rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full"></div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">量子化された軌道</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'wave_function') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-2xl font-bold text-purple-400 mb-2">Ψ(x,t)</div>
+                        <div className="text-xs text-gray-400">確率振幅の波</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'feynman_diagram') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-32 h-24">
+                            <svg viewBox="0 0 128 96" className="w-full h-full">
+                                <line x1="10" y1="20" x2="50" y2="48" stroke="#60a5fa" strokeWidth="2" />
+                                <line x1="10" y1="76" x2="50" y2="48" stroke="#60a5fa" strokeWidth="2" />
+                                <path d="M 50,48 Q 64,30 78,48" stroke="#fbbf24" strokeWidth="2" fill="none" strokeDasharray="3,3" />
+                                <line x1="78" y1="48" x2="118" y2="20" stroke="#60a5fa" strokeWidth="2" />
+                                <line x1="78" y1="48" x2="118" y2="76" stroke="#60a5fa" strokeWidth="2" />
+                            </svg>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">粒子の相互作用</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'black_hole') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="relative w-24 h-24 bg-black rounded-full border-4 border-purple-500 flex items-center justify-center">
+                            <div className="text-white text-xs">事象の地平面</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2">ホーキング放射</div>
+                    </div>
+                );
+            }
+            
+            if (type === 'string_theory') {
+                return (
+                    <div className="flex flex-col items-center p-4">
+                        <div className="text-4xl mb-2">🎻</div>
+                        <div className="text-lg font-bold text-green-400">弦（ひも）</div>
+                        <div className="text-xs text-gray-400 mt-2">10次元の時空</div>
+                    </div>
+                );
+            }
+            
+            return <div className="text-gray-500 text-sm p-4 text-center">図解準備中</div>;
+        };
+        
+        // ----------------------------------------------------------------------------
+        // MAIN APP
+        // ----------------------------------------------------------------------------
+        
+        const PhysicsApp = () => {
+            const [selectedEra, setSelectedEra] = useState('classical');
+            const [selectedPhysicist, setSelectedPhysicist] = useState(null);
+            const [mobileView, setMobileView] = useState('era');
+            
+            useEffect(() => {
+                const physicists = PHYSICISTS[selectedEra] || [];
+                setSelectedPhysicist(physicists[0] || null);
+            }, [selectedEra]);
+            
+            const physicists = PHYSICISTS[selectedEra] || [];
+            
+            const handleEraSelect = (eraId) => {
+                setSelectedEra(eraId);
+                setMobileView('list');
+            };
+            
+            const handlePhysicistSelect = (physicist) => {
+                setSelectedPhysicist(physicist);
+                setMobileView('content');
+            };
+            
+            const handleBack = () => {
+                if (mobileView === 'content') {
+                    setMobileView('list');
+                } else if (mobileView === 'list') {
+                    setMobileView('era');
+                }
+            };
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    {/* Header */}
+                    <header className="border-b border-gray-800 bg-gray-900 p-4 md:p-6">
+                        <div className="md:hidden flex items-center justify-between mb-3">
+                            {mobileView !== 'era' && (
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                                >
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">戻る</span>
+                                </button>
+                            )}
+                            <a
+                                href="../index.html"
+                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
+                            >
+                                <Home size={18} />
+                                <span className="text-sm">ホーム</span>
+                            </a>
+                        </div>
+                        <div className="hidden md:flex justify-between items-center">
+                            <div className="flex-1">
+                                <a
+                                    href="./index.html"
+                                    className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                                >
+                                    <Book size={20} />
+                                    <span className="text-sm">📖 簡易版を見る</span>
+                                </a>
+                            </div>
+                            <div className="flex-1 text-center">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                    物理学図鑑 詳細版
+                                </h1>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Physics Deep Dive</p>
+                            </div>
+                            <div className="flex-1 flex justify-end">
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={20} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className="md:hidden">
+                            <div className="flex justify-center items-center gap-2 mb-2">
+                                <a
+                                    href="./index.html"
+                                    className="text-purple-400 hover:text-purple-300 transition-colors text-xs"
+                                >
+                                    📖 簡易版
+                                </a>
+                            </div>
+                            <div className="text-center">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                                    物理学図鑑 詳細版
+                                </h1>
+                                <p className="text-gray-400 text-xs mt-2">Physics Deep Dive</p>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex h-[calc(100vh-120px)]">
+                        <div className="w-64 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4">
+                            {ERAS.map((era) => (
+                                <div
+                                    key={era.id}
+                                    className={`flex items-start gap-3 p-4 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedEra === era.id
+                                            ? 'bg-purple-900 border border-purple-600 shadow-lg shadow-purple-500/30'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedEra(era.id)}
+                                >
+                                    <div className="mt-1">{era.icon}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-semibold">{era.title}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="w-64 bg-gray-950 border-r border-gray-800 overflow-y-auto p-4">
+                            <h2 className="text-base font-semibold text-gray-300 mb-4">物理学者一覧</h2>
+                            {physicists.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                                        selectedPhysicist?.id === p.id
+                                            ? 'bg-purple-900/50 border border-purple-600'
+                                            : 'bg-gray-800 hover:bg-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedPhysicist(p)}
+                                >
+                                    <div className="font-semibold text-sm">{p.name}</div>
+                                    <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-900 overflow-y-auto p-6">
+                            {selectedPhysicist && (
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                                        <div className="mb-8">
+                                            <h2 className="text-3xl font-bold text-purple-400 mb-3">{selectedPhysicist.name}</h2>
+                                            <p className="text-gray-400 text-lg">{selectedPhysicist.title}</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                                    ❓ 問い
+                                                </h3>
+                                                <p className="text-gray-300">{selectedPhysicist.question}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                                    💡 答え
+                                                </h3>
+                                                <p className="text-white font-semibold">{selectedPhysicist.answer}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                                    📖 詳細
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">{selectedPhysicist.detail}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                                    🔗 系譜
+                                                </h3>
+                                                <p className="text-gray-400">{selectedPhysicist.connection}</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                                    📊 図解
+                                                </h3>
+                                                <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 min-h-64 flex items-center justify-center">
+                                                    <DiagramBuilder type={selectedPhysicist.diagramType} content={selectedPhysicist.diagramContent} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {mobileView === 'era' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">時代区分</h2>
+                                {ERAS.map((era) => (
+                                    <div
+                                        key={era.id}
+                                        className="flex items-start gap-3 p-4 mb-3 rounded-lg cursor-pointer transition-all bg-gray-800 active:bg-gray-700"
+                                        onClick={() => handleEraSelect(era.id)}
+                                    >
+                                        <div className="mt-1">{era.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-semibold">{era.title}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{era.period}</div>
+                                        </div>
+                                        <div className="mt-1">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'list' && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-950 p-4">
+                                <h2 className="text-lg font-semibold text-gray-300 mb-4">物理学者一覧</h2>
+                                {physicists.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className={`p-4 mb-3 rounded-lg cursor-pointer transition-all ${
+                                            selectedPhysicist?.id === p.id
+                                                ? 'bg-purple-900/50 border border-purple-600'
+                                                : 'bg-gray-800 active:bg-gray-700'
+                                        }`}
+                                        onClick={() => handlePhysicistSelect(p)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-sm">{p.name}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{p.title}</div>
+                                            </div>
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {mobileView === 'content' && selectedPhysicist && (
+                            <div className="min-h-[calc(100vh-140px)] bg-gray-900 overflow-y-auto p-4">
+                                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-purple-400 mb-2">{selectedPhysicist.name}</h2>
+                                        <p className="text-gray-400 text-base">{selectedPhysicist.title}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-500">
+                                            ❓ 問い
+                                        </h3>
+                                        <p className="text-gray-300 text-sm">{selectedPhysicist.question}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-500">
+                                            💡 答え
+                                        </h3>
+                                        <p className="text-white font-semibold text-sm">{selectedPhysicist.answer}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-purple-400">
+                                            📖 詳細
+                                        </h3>
+                                        <p className="text-gray-300 text-sm leading-relaxed">{selectedPhysicist.detail}</p>
+                                    </div>
+                                    
+                                    <div className="mb-5">
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-blue-400">
+                                            🔗 系譜
+                                        </h3>
+                                        <p className="text-gray-400 text-sm">{selectedPhysicist.connection}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-gray-400">
+                                            📊 図解
+                                        </h3>
+                                        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 min-h-48 flex items-center justify-center">
+                                            <DiagramBuilder type={selectedPhysicist.diagramType} content={selectedPhysicist.diagramContent} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PhysicsApp />);
+    </script>
+</body>
+</html>
