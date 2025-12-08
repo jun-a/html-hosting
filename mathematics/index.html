@@ -8,6 +8,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -19,7 +21,27 @@
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
+        
+        // KaTeX rendering component
+        const KatexFormula = ({ formula, className = "", displayMode = true }) => {
+            const ref = useRef(null);
+            
+            useEffect(() => {
+                if (ref.current && window.katex) {
+                    try {
+                        window.katex.render(formula, ref.current, {
+                            throwOnError: false,
+                            displayMode: displayMode
+                        });
+                    } catch (e) {
+                        console.error("KaTeX rendering error:", e);
+                    }
+                }
+            }, [formula, displayMode]);
+            
+            return <div ref={ref} className={className}></div>;
+        };
         
         // Lucide React icons
         const Triangle = ({ size = 24 }) => (
@@ -183,13 +205,13 @@
             if (type === 'pythagorean') {
                 return (
                     <div className="flex flex-col items-center p-4">
-                        <div className="relative">
+                        <div className="relative mb-4">
                             <svg width="120" height="120" viewBox="0 0 120 120">
                                 <polygon points="10,110 110,110 60,10" stroke="#3b82f6" strokeWidth="2" fill="none" />
                                 <line x1="60" y1="110" x2="60" y2="10" stroke="#fbbf24" strokeWidth="1" strokeDasharray="3,3" />
-                                <text x="60" y="105" fill="#ffffff" fontSize="12" textAnchor="middle">a²+b²=c²</text>
                             </svg>
                         </div>
+                        <KatexFormula formula="a^2 + b^2 = c^2" className="text-blue-400" />
                     </div>
                 );
             }
@@ -197,8 +219,8 @@
             if (type === 'calculus') {
                 return (
                     <div className="flex flex-col items-center gap-3 p-4">
-                        <div className="text-xl font-bold text-blue-400">∫ f(x)dx</div>
-                        <div className="text-xl font-bold text-green-400">d/dx f(x)</div>
+                        <KatexFormula formula="\int f(x)\,dx" className="text-xl font-bold text-blue-400" />
+                        <KatexFormula formula="\frac{d}{dx} f(x)" className="text-xl font-bold text-green-400" />
                         <div className="text-xs text-gray-400">積分と微分</div>
                     </div>
                 );
@@ -207,7 +229,7 @@
             if (type === 'euler_identity') {
                 return (
                     <div className="flex flex-col items-center p-4">
-                        <div className="text-2xl font-bold text-purple-400 mb-2">e^(iπ) + 1 = 0</div>
+                        <KatexFormula formula="e^{i\pi} + 1 = 0" className="text-2xl font-bold text-purple-400 mb-2" />
                         <div className="text-xs text-gray-400">最も美しい数式</div>
                     </div>
                 );
@@ -216,9 +238,15 @@
             if (type === 'infinity_levels') {
                 return (
                     <div className="flex flex-col items-center gap-2 p-4">
-                        <div className="text-lg text-blue-400">ℵ₀ (可算無限)</div>
+                        <div className="flex items-center gap-2">
+                            <KatexFormula formula="\aleph_0" className="text-lg text-blue-400" displayMode={false} />
+                            <span className="text-gray-400">(可算無限)</span>
+                        </div>
                         <div className="text-2xl">↓</div>
-                        <div className="text-lg text-red-400">ℵ₁ (連続体)</div>
+                        <div className="flex items-center gap-2">
+                            <KatexFormula formula="\aleph_1" className="text-lg text-red-400" displayMode={false} />
+                            <span className="text-gray-400">(連続体)</span>
+                        </div>
                         <div className="text-xs text-gray-400 mt-2">無限の階層</div>
                     </div>
                 );
