@@ -1,0 +1,260 @@
+        const ECONOMISTS = {
+            // --- CLASSICAL ---
+            classical: [
+                {
+                    id: 'smith',
+                    name: 'アダム・スミス',
+                    title: '経済学の父',
+                    question: '国の富とは何か、どうすれば増やせるか？',
+                    answer: '富は「労働」が生み出す。分業と市場の「見えざる手」に任せれば豊かになる。',
+                    detail: '『国富論』(1776)で近代経済学を創始。重商主義（金の蓄積こそ富）を批判し、生産力こそが富の源泉だとした。ピン工場の分業の例は有名。各人が利己心に従って行動すれば、見えざる手に導かれて社会全体の利益になるという楽観論。',
+                    connection: '古典派経済学の祖。リカードへ続く。',
+                    diagramType: 'invisible_hand',
+                    diagramContent: null
+                },
+                {
+                    id: 'ricardo',
+                    name: 'デヴィッド・リカード',
+                    title: '比較優位の理論家',
+                    question: '貿易は誰にとって得なのか？',
+                    answer: '比較優位に基づいて特化すれば、双方が得をする。',
+                    detail: 'ワインと布の例で、ポルトガルがどちらも得意でも、イギリスが比較的得意な布に特化すれば両国が利益を得られることを示した。地代論や労働価値説も展開。',
+                    connection: 'スミスの弟子。マルクスに影響。',
+                    diagramType: 'comparative_advantage',
+                    diagramContent: null
+                },
+                {
+                    id: 'malthus',
+                    name: 'トマス・マルサス',
+                    title: '人口論の提唱者',
+                    question: '人類は永遠に豊かになれるのか？',
+                    answer: 'いいえ。人口は幾何級数的に増えるが、食料は算術級数的にしか増えない。',
+                    detail: '『人口論』(1798)で、人口増加が食料生産を上回り、必ず貧困・飢餓・戦争が起きると予測。「悲観論の経済学」と呼ばれたが、産業革命で予測は外れた。しかし環境問題の文脈で再評価されている。',
+                    connection: 'ケインズの師の師。',
+                    diagramType: 'malthus_trap',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- NEOCLASSICAL ---
+            neoclassical: [
+                {
+                    id: 'jevons',
+                    name: 'W.S.ジェヴォンズ',
+                    title: '限界革命の先駆者',
+                    question: '価値はどうやって決まるのか？',
+                    answer: '労働量ではなく、最後の1単位がもたらす「限界効用」で決まる。',
+                    detail: 'メンガー、ワルラスと同時期に限界効用理論を発見。ダイヤモンドと水のパラドックス（水は役立つが安い、ダイヤは不要だが高い）を、限界効用で説明した。',
+                    connection: '限界革命（1870年代）の三巨頭の一人。',
+                    diagramType: 'marginal_utility',
+                    diagramContent: null
+                },
+                {
+                    id: 'marshall',
+                    name: 'アルフレッド・マーシャル',
+                    title: '新古典派の統合者',
+                    question: '需要と供給はどうバランスするのか？',
+                    answer: '価格メカニズムが、需要曲線と供給曲線の交点で均衡をもたらす。',
+                    detail: '『経済学原理』(1890)で需給曲線、弾力性、消費者余剰などの概念を体系化。「短期と長期」の区別も導入。ケンブリッジ学派の祖。',
+                    connection: 'ケインズの師。',
+                    diagramType: 'supply_demand',
+                    diagramContent: null
+                },
+                {
+                    id: 'walras',
+                    name: 'レオン・ワルラス',
+                    title: '一般均衡理論',
+                    question: '市場全体が同時に均衡することは可能か？',
+                    answer: '可能だ。一般均衡理論によって、すべての市場が同時に調整される。',
+                    detail: '数学を用いて、複数市場が相互に影響し合いながら均衡に達する仕組みを定式化。現代ミクロ経済学の基礎を築いた。',
+                    connection: '限界革命の三巨頭。アロー・ドブリューへ。',
+                    diagramType: 'general_equilibrium',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- MARXIST ---
+            marxist: [
+                {
+                    id: 'marx_econ',
+                    name: 'カール・マルクス',
+                    title: '剰余価値理論',
+                    question: '資本家はどうやって利益を得るのか？',
+                    answer: '労働者の「剰余労働」を搾取することで利益（剰余価値）を得る。',
+                    detail: '『資本論』(1867-)。労働こそが価値を生み出すが、資本家は労働力を商品として買い、労働者が生み出す価値の一部しか賃金として払わない。この差額が利潤の源泉。資本主義の内在的矛盾（恐慌・失業）により、いずれ崩壊すると予言。',
+                    connection: 'リカードの労働価値説を批判的に継承。',
+                    diagramType: 'surplus_value',
+                    diagramContent: null
+                },
+                {
+                    id: 'lenin',
+                    name: 'V.I.レーニン',
+                    title: '帝国主義論',
+                    question: '資本主義はなぜ崩壊しないのか？',
+                    answer: '植民地市場に進出し、延命しているだけだ（帝国主義段階）。',
+                    detail: '『帝国主義論』(1916)。独占資本と金融資本が結びつき、世界を分割支配。しかし最終的には帝国主義戦争と革命で崩壊すると予測。ロシア革命を指導。',
+                    connection: 'マルクス主義の実践者。',
+                    diagramType: 'imperialism',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- KEYNESIAN ---
+            keynesian: [
+                {
+                    id: 'keynes',
+                    name: 'ジョン・M・ケインズ',
+                    title: 'マクロ経済学の父',
+                    question: '大恐慌のような失業はなぜ起きるのか？',
+                    answer: '「有効需要」が不足するからだ。政府が支出を増やせば解決する。',
+                    detail: '『一般理論』(1936)で古典派の「市場は自動調整される」という前提を否定。貯蓄が増えすぎると消費・投資が減り、不況になる（セイ法則の否定）。財政政策・金融政策で需要を喚起すべきと説く。',
+                    connection: 'マーシャルの弟子。20世紀経済学の革命。',
+                    diagramType: 'effective_demand',
+                    diagramContent: null
+                },
+                {
+                    id: 'samuelson',
+                    name: 'ポール・サミュエルソン',
+                    title: '新古典派総合',
+                    question: 'ケインズ経済学と新古典派は両立するのか？',
+                    answer: '短期はケインズ、長期は新古典派。両者を統合できる。',
+                    detail: '『経済学』教科書で世界中の経済学教育を標準化。45度線分析、乗数理論などを普及させた。数学的手法を経済学に本格導入。ノーベル経済学賞第1号（1970）。',
+                    connection: 'ケインジアンの旗手。',
+                    diagramType: 'neoclassical_synthesis',
+                    diagramContent: null
+                },
+                {
+                    id: 'hicks',
+                    name: 'ジョン・R・ヒックス',
+                    title: 'IS-LMモデル',
+                    question: 'ケインズ理論を図で理解するには？',
+                    answer: 'IS-LMモデルで、財市場と貨幣市場の同時均衡を示せる。',
+                    detail: 'ケインズの複雑な理論を、財市場（IS曲線）と貨幣市場（LM曲線）の2本の曲線で表現。マクロ経済学の教科書モデルとなった。',
+                    connection: 'ケインズ理論の定式化。ノーベル賞1972。',
+                    diagramType: 'is_lm',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- LIBERTARIAN ---
+            libertarian: [
+                {
+                    id: 'hayek',
+                    name: 'F.A.ハイエク',
+                    title: '自由の哲学者',
+                    question: '計画経済は効率的か？',
+                    answer: 'いいえ。市場の分散的な知識を、中央は決して集められない。',
+                    detail: '『隷属への道』(1944)で社会主義・計画経済を批判。市場価格こそが、無数の個人の知識を集約する優れた情報システムだとした。政府介入はかえって自由を破壊すると警告。',
+                    connection: 'オーストリア学派。フリードマンと共に新自由主義の双璧。',
+                    diagramType: 'dispersed_knowledge',
+                    diagramContent: null
+                },
+                {
+                    id: 'friedman',
+                    name: 'ミルトン・フリードマン',
+                    title: 'マネタリストの巨匠',
+                    question: 'インフレの原因は何か？',
+                    answer: '「いつでもどこでも貨幣的現象」だ。中央銀行の金融政策がすべて。',
+                    detail: 'ケインズ政策を批判し、財政政策より金融政策が重要と主張。自然失業率仮説、恒常所得仮説など。政府の役割を最小化し、市場に任せるべきと説く。ノーベル賞1976。',
+                    connection: 'シカゴ学派の長。レーガノミクスに影響。',
+                    diagramType: 'monetarism',
+                    diagramContent: null
+                },
+                {
+                    id: 'lucas',
+                    name: 'ロバート・ルーカス',
+                    title: '合理的期待革命',
+                    question: 'ケインズ政策は本当に効くのか？',
+                    answer: '人々は政府の行動を予測するので、効果は限定的だ（ルーカス批判）。',
+                    detail: '合理的期待形成理論で、人々が完全に将来を予測すれば、政府の政策効果は消えてしまうと主張。マクロ経済学をミクロ的基礎の上に再構築。ノーベル賞1995。',
+                    connection: 'ニューマクロ経済学の創始者。',
+                    diagramType: 'rational_expectations',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- GAME THEORY ---
+            game: [
+                {
+                    id: 'nash',
+                    name: 'ジョン・ナッシュ',
+                    title: 'ナッシュ均衡',
+                    question: '互いに影響し合う状況で、どう行動すべきか？',
+                    answer: '相手の戦略を所与として、自分の最適戦略を選ぶ「ナッシュ均衡」に落ち着く。',
+                    detail: '非協力ゲーム理論を確立。囚人のジレンマなど、個々の合理性が全体の非合理を生む現象を分析。映画『ビューティフル・マインド』のモデル。ノーベル賞1994。',
+                    connection: 'フォン・ノイマンの後継。',
+                    diagramType: 'nash_equilibrium',
+                    diagramContent: null
+                },
+                {
+                    id: 'coase',
+                    name: 'ロナルド・コース',
+                    title: '取引費用理論',
+                    question: '企業はなぜ存在するのか？',
+                    answer: '市場取引には費用（取引費用）がかかるから、組織内で行う方が効率的な場合がある。',
+                    detail: '『企業の性質』(1937)、『社会的費用の問題』(1960)。コースの定理：財産権が明確で取引費用がゼロなら、資源配分は効率的になる（誰が権利を持つかによらない）。ノーベル賞1991。',
+                    connection: '制度派経済学の源流。',
+                    diagramType: 'transaction_cost',
+                    diagramContent: null
+                },
+                {
+                    id: 'north',
+                    name: 'ダグラス・ノース',
+                    title: '新制度派経済学',
+                    question: 'なぜ国によって経済発展に差があるのか？',
+                    answer: '「制度（ルール）」の質が違うからだ。良い制度が成長を促す。',
+                    detail: '所有権、法の支配、契約執行などの制度インフラが経済成果を決めるとした。歴史の経済分析にも貢献。ノーベル賞1993。',
+                    connection: 'コースの影響。アセモグルへ続く。',
+                    diagramType: 'institutions',
+                    diagramContent: null
+                }
+            ],
+            
+            // --- BEHAVIORAL ---
+            behavioral: [
+                {
+                    id: 'kahneman',
+                    name: 'ダニエル・カーネマン',
+                    title: '行動経済学の父',
+                    question: '人間は本当に合理的か？',
+                    answer: 'いいえ。人間は「ヒューリスティック（直感）」とバイアスに満ちている。',
+                    detail: 'トヴェルスキーとの共同研究で、プロスペクト理論を提唱。人は損失を利益の2倍重く感じる（損失回避）。フレーミング効果、アンカリングなど認知バイアスを実証。心理学者として経済学ノーベル賞（2002）。',
+                    connection: '新古典派の合理的人間像を破壊。',
+                    diagramType: 'prospect_theory',
+                    diagramContent: null
+                },
+                {
+                    id: 'thaler',
+                    name: 'リチャード・セイラー',
+                    title: 'ナッジ理論',
+                    question: '人々により良い選択をさせるには？',
+                    answer: '強制せず、「ナッジ（そっと後押し）」で誘導すればいい。',
+                    detail: '行動経済学を政策に応用。デフォルト設定（初期値）を変えるだけで、貯蓄率や臓器提供率が劇的に変わる。「リバタリアン・パターナリズム」を提唱。ノーベル賞2017。',
+                    connection: 'カーネマンの継承者。',
+                    diagramType: 'nudge',
+                    diagramContent: null
+                },
+                {
+                    id: 'piketty',
+                    name: 'トマ・ピケティ',
+                    title: '格差研究の旗手',
+                    question: '資本主義は格差を拡大するのか？',
+                    answer: 'する。資本収益率r > 経済成長率g のとき、格差は自動的に拡大する。',
+                    detail: '『21世紀の資本』(2013)で300年の税務データを分析。富裕層の資産が労働所得より速く増えることを実証。富裕税を提案し、世界的ベストセラーに。',
+                    connection: '実証的格差研究の復活。',
+                    diagramType: 'piketty_inequality',
+                    diagramContent: null
+                },
+                {
+                    id: 'acemoglu',
+                    name: 'ダロン・アセモグル',
+                    title: '制度と成長の経済学',
+                    question: 'なぜ豊かな国と貧しい国があるのか？',
+                    answer: '「包括的（民主的）制度」か「収奪的（独裁的）制度」かの違いだ。',
+                    detail: '『国家はなぜ衰退するのか』でジェームズ・ロビンソンと共著。植民地の歴史、政治制度が長期的な経済成果を決定すると主張。「創造的破壊」を許す制度が重要。',
+                    connection: 'ノースの後継。2024年ノーベル賞。',
+                    diagramType: 'extractive_inclusive',
+                    diagramContent: null
+                }
+            ]
+        };
