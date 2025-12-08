@@ -244,16 +244,33 @@
                                     <span className="text-sm">戻る</span>
                                 </button>
                             )}
-                            <a
-                                href="../index.html"
-                                className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors ml-auto"
-                            >
-                                <Home size={18} />
-                                <span className="text-sm">ホーム</span>
-                            </a>
+                            <div className="flex items-center gap-3 ml-auto">
+                                <a
+                                    href="deepdive.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Book size={18} />
+                                    <span className="text-sm">🔬 詳細版</span>
+                                </a>
+                                <a
+                                    href="../index.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Home size={18} />
+                                    <span className="text-sm">ホーム</span>
+                                </a>
+                            </div>
                         </div>
                         <div className="hidden md:flex justify-between items-center">
-                            <div className="flex-1"></div>
+                            <div className="flex-1 flex items-center gap-4">
+                                <a
+                                    href="deepdive.html"
+                                    className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    <Book size={20} />
+                                    <span className="text-sm">🔬 詳細版を見る</span>
+                                </a>
+                            </div>
                             <div className="flex-1 text-center">
                                 <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
                                     政治思想図鑑
