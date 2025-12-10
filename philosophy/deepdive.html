@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哲学詳細図鑑 - Philosophy Deep Dive</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.open {
+            max-height: 15000px;
+            transition: max-height 0.5s ease-in;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        // Icons - simplified inline SVG components
+        const ChevronDown = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>;
+        const ChevronUp = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"></polyline></svg>;
+        const Search = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>;
+        const Home = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>;
+        const ArrowLeft = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
+        const Clock = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+        const BookOpen = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>;
+        const Lightbulb = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.52.73 2.88 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>;
+        const Network = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="5" r="1"></circle><circle cx="5" cy="19" r="1"></circle><line x1="13" y1="11" x2="18" y2="6"></line><line x1="11" y1="13" x2="6" y2="18"></line></svg>;
+        
+        // Collapsible Section Component
+        const CollapsibleSection = ({ title, icon, children, defaultOpen = false }) => {
+            const [isOpen, setIsOpen] = useState(defaultOpen);
+            return (
+                <div className="mb-4 bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-full p-4 flex items-center justify-between hover:bg-gray-750 transition-colors"
+                    >
+                        <div className="flex items-center gap-3">
+                            {typeof icon === 'string' ? <span className="text-xl">{icon}</span> : icon}
+                            <h3 className="text-lg font-semibold">{title}</h3>
+                        </div>
+                        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                    <div className={`collapsible-content ${isOpen ? 'open' : ''}`}>
+                        <div className="p-4 pt-0 text-gray-300 leading-relaxed whitespace-pre-line">
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        console.log("Philosophy Deep Dive loaded");
+        
+        // For now, creating a minimal viable version - full content will be added incrementally
+        const ERAS = [
+            { id: 'ancient', title: '古代ギリシャ哲学', period: 'BC 600 - AD 400', color: 'blue' },
+            { id: 'medieval', title: '中世哲学', period: 'AD 400 - 1400', color: 'purple' },
+            { id: 'early_modern', title: '近代哲学', period: '1600 - 1800', color: 'cyan' },
+            { id: 'modern', title: '現代哲学', period: '1800 - Present', color: 'green' }
+        ];
+        
+        const PHILOSOPHERS = {
+            ancient: [
+                {
+                    id: 'socrates',
+                    name: 'ソクラテス',
+                    title: '知の助産師',
+                    years: 'BC 469 - BC 399',
+                    bio: '自己内省の始まり。無知の知。問答法による真理の探求。',
+                    detail: 'ソクラテスはアテナイの石工の息子として生まれた。青年期は彫刻家として働き、戦争にも従軍した勇敢な兵士だった。デルフォイの神託「ソクラテスより知恵ある者はいない」を受けて、街頭での対話を開始。この問答法（エレンコス）により、人々の無知を自覚させる活動を生涯続けた。「吟味されない生は生きるに値しない」という信念のもと、若者を「堕落させた」として告発され、紀元前399年に毒杯を仰いで死んだ。彼の思想は弟子プラトンの対話篇を通じて伝えられる。'
+                },
+                {
+                    id: 'plato',
+                    name: 'プラトン',
+                    title: 'イデア論の創始者',
+                    years: 'BC 427 - BC 347',
+                    bio: '現実世界の背後に永遠不変のイデア界があるとする二元論。',
+                    detail: 'プラトンはアテナイの貴族の家に生まれ、ソクラテスの弟子となった。師の死後、シチリアやエジプトを旅し、紀元前387年にアカデメイアという学園を創設。これは西洋最初の大学である。主著『国家』では理想国家と哲人王を論じ、洞窟の比喩でイデア論を展開。イデアとは完全で永遠不変の真の実在であり、現実世界はその不完全な影に過ぎない。魂の三分説、想起説など、後世に計り知れない影響を与えた。'
+                },
+                {
+                    id: 'aristotle',
+                    name: 'アリストテレス',
+                    title: '万学の祖・論理学の創始者',
+                    years: 'BC 384 - BC 322',
+                    bio: '形相（エイドス）は個々の事物の中に内在する。質料と形相の結合が実体だ。',
+                    detail: 'アリストテレスはマケドニアのスタゲイラに生まれた。17歳でプラトンのアカデメイアに入学し20年間学ぶ。プラトンの死後、リュケイオン学園を創設し、逍遥学派と呼ばれた。アレクサンドロス大王の家庭教師を務める。論理学、形而上学、自然学、倫理学、政治学など広範な領域で体系的著作を残した。実体論、四原因説（質料因・形相因・作用因・目的因）、中庸の徳など、2000年以上にわたり西洋思想の基礎となった。'
+                },
+                {
+                    id: 'heraclitus',
+                    name: 'ヘラクレイトス',
+                    title: '流転の哲学者',
+                    years: 'BC 540 - BC 480',
+                    bio: '万物は流転する（パンタ・レイ）。同じ川に二度入ることはできない。',
+                    detail: 'ヘラクレイトスはエペソスの王族に生まれたが、王位を弟に譲り孤独な思索生活を送った。「暗い哲学者」として知られ、謎めいた断片のみが残る。万物流転、対立の統一、ロゴス（宇宙の理法）、火の原理など、変化と対立を重視する思想を展開。パルメニデスの不変の存在論と対照的。ヘーゲルやマルクスの弁証法、プロセス哲学に影響を与えた。'
+                },
+                {
+                    id: 'parmenides',
+                    name: 'パルメニデス',
+                    title: 'エレア派の始祖',
+                    years: 'BC 515頃 - BC 450頃',
+                    bio: '「ある」ものはある。「ない」ものはない。変化は錯覚である。',
+                    detail: 'パルメニデスは南イタリアのエレアに生まれた。詩『自然について』で、存在の道（真理）と非存在の道（迷妄）を対比。論理的思考により、「無」から「有」は生まれないゆえ、世界は不生不滅の「一者」であると論じた。変化、多様性、運動は感覚の錯覚に過ぎない。この徹底した存在論はプラトンのイデア論に影響を与え、形而上学の根本問題を提起した。'
+                },
+                {
+                    id: 'epicurus',
+                    name: 'エピクロス',
+                    title: '快楽主義の哲学者',
+                    years: 'BC 341 - BC 270',
+                    bio: '快楽こそが善である。しかし真の快楽とは心の平静（アタラクシア）だ。',
+                    detail: 'エピクロスはサモス島に生まれ、アテナイに「庭園」という学園を創設した。デモクリトスの原子論を継承し、魂も原子からなるため死後は消滅すると主張。死を恐れる必要はない。神々は存在するが人間界に関与しない。真の快楽は肉体的快楽ではなく、欲望を抑え、苦痛を避け、友人と質素に暮らす中にある。この思想はローマのルクレティウス、近代ではベンサム、ミルの功利主義に影響を与えた。'
+                },
+                {
+                    id: 'zeno_stoic',
+                    name: 'ゼノン（ストア派）',
+                    title: 'ストア派の創始者',
+                    years: 'BC 334 - BC 262',
+                    bio: '自然（ロゴス）に従って生きよ。徳のみが善であり、外的なものは無関心である。',
+                    detail: 'ゼノンはキプロス島のキティオンに生まれ、アテナイで「彩色柱廊（ストア・ポイキレ）」で教えたことからストア派と呼ばれる。宇宙はロゴス（理性）に支配され、すべては必然である。人間は自然の一部として理性的に生きるべきで、情念に惑わされず、運命を受け入れる心の平静（アパテイア）を目指す。富、名誉、健康などは「無関心なもの」で、真に善なのは徳のみ。この思想は後のローマストア派（セネカ、エピクテトス、マルクス・アウレリウス）に受け継がれ、キリスト教倫理にも影響を与えた。'
+                }
+            ],
+            medieval: [
+                {
+                    id: 'augustine',
+                    name: 'アウグスティヌス',
+                    title: '最大の教父・西洋キリスト教哲学の父',
+                    years: '354 - 430',
+                    bio: '悪とは善の欠如である。時間は神の創造とともに始まった。',
+                    detail: 'アウグスティヌスは北アフリカのタガステに生まれた。若い頃は放蕩とマニ教に傾倒したが、アンブロシウスの説教と新プラトン主義を経て32歳でキリスト教に改宗。『告白録』で有名な回心体験を描く。『神の国』では「神の国」と「地の国」の対比で歴史を論じた。悪の欠如説、自由意志と恩寵、予定説、時間の主観性など、中世神学と近代哲学の両方に多大な影響を与えた。'
+                },
+                {
+                    id: 'aquinas',
+                    name: 'トマス・アクィナス',
+                    title: 'スコラ哲学の完成者・天使的博士',
+                    years: '1225 - 1274',
+                    bio: '恩寵は自然を破壊せず完成する。信仰と理性は調和する。',
+                    detail: 'トマス・アクィナスはイタリア南部のロッカセッカ城に生まれた。ドミニコ会士としてパリ大学で学び、アルベルトゥス・マグヌスに師事。アリストテレス哲学とキリスト教神学の統合を試み、『神学大全』を著した。神の存在の五つの証明、本質と存在の区別、自然法論、徳の理論など、カトリック神学の公式教義となる。近代では批判されたが、20世紀に新トマス主義として復興し、現代の徳倫理学や自然法論に影響を与えている。'
+                },
+                {
+                    id: 'anselm',
+                    name: 'アンセルムス',
+                    title: '最後の教父・最初のスコラ学者',
+                    years: '1033 - 1109',
+                    bio: '信仰は理解を求める（fides quaerens intellectum）。',
+                    detail: 'アンセルムスは北イタリアのアオスタに生まれ、ベック修道院長を経てカンタベリー大主教となる。『プロスロギオン』で存在論的論証を展開：「それより大きなものが考えられない存在者」という神の定義から、神の現実存在を証明しようとした。この論証は哲学史上最も議論された証明の一つで、デカルト、ライプニッツが支持し、カント、ラッセルが批判。現代でもプランティンガが様相論理学で洗練化している。'
+                },
+                {
+                    id: 'ockham',
+                    name: 'オッカム',
+                    title: '唯名論の旗手・オッカムの剃刀',
+                    years: '1287頃 - 1347',
+                    bio: '必要なしに存在を増やすべからず。普遍者は実在せず、名前に過ぎない。',
+                    detail: 'ウィリアム・オブ・オッカムはイングランドのオッカム村に生まれた。フランシスコ会士としてオックスフォード大学で学ぶ。唯名論の立場から、普遍者（人間性、赤さなど）の実在を否定し、個物のみが実在すると主張。「オッカムの剃刀」（説明に不要な仮定は削るべき）は現代科学の方法論原理となった。教皇権と対立し破門されるが、その批判精神は中世スコラ哲学の解体と近代の個人主義・懐疑主義への道を開いた。'
+                }
+            ],
+            early_modern: [
+                {
+                    id: 'descartes',
+                    name: 'デカルト',
+                    title: '近代哲学の父・方法的懐疑',
+                    years: '1596 - 1650',
+                    bio: '我思う、ゆえに我あり（Cogito, ergo sum）。心身二元論。',
+                    detail: 'ルネ・デカルトはフランスのラ・エーに生まれた。イエズス会学校で学んだ後、軍人として各地を転戦。1619年、暖炉の部屋で思索し、哲学の新しい基礎を着想。『方法序説』と『省察』で方法的懐疑を展開：すべてを疑っても、疑っている自分の存在は疑えない。ここから明晰判明な認識の規準、神の存在証明、心身二元論（延長する物体と思惟する精神の二実体）を構築。解析幾何学の創始者でもあり、数学と哲学を統合した合理主義哲学の祖となった。'
+                },
+                {
+                    id: 'spinoza',
+                    name: 'スピノザ',
+                    title: '汎神論の哲学者・神即自然',
+                    years: '1632 - 1677',
+                    bio: '神＝自然。実体は一つだけで、それは神である。',
+                    detail: 'バルーフ・スピノザはアムステルダムのユダヤ人家庭に生まれた。伝統的ユダヤ教から離れ、1656年にユダヤ教会から破門される。レンズ磨きで生計を立てながら哲学を探究。主著『エチカ』は幾何学的方法（公理と定理の演繹）で倫理学を展開。神と自然を同一視する汎神論、精神と身体の平行論、自由は必然性の認識であるという思想、知性愛による至福など、当時は危険思想とされたが、ドイツ観念論やアインシュタインなど後世に大きな影響を与えた。'
+                },
+                {
+                    id: 'leibniz',
+                    name: 'ライプニッツ',
+                    title: '普遍的天才・モナド論',
+                    years: '1646 - 1716',
+                    bio: '世界は無数のモナド（単子）からなる。これは可能世界の中で最善の世界である。',
+                    detail: 'ゴットフリート・ヴィルヘルム・ライプニッツはライプツィヒに生まれた。数学（微積分、二進法）、物理学、論理学、法学、歴史学、神学など、あらゆる分野で業績を残した普遍的天才。哲学では、世界は無数の「モナド」（不可分の実体）からなり、各モナドは「窓がない」（他のモナドから影響を受けない）が、予定調和により宇宙全体が秩序を保つと論じた。十分理由律、矛盾律、最善世界説、可能世界の理論など、現代の様相論理学や分析形而上学に影響を与えている。'
+                },
+                {
+                    id: 'locke',
+                    name: 'ロック',
+                    title: '経験論の父・タブラ・ラサ',
+                    years: '1632 - 1704',
+                    bio: '生得観念は存在しない。心は白紙（タブラ・ラサ）である。',
+                    detail: 'ジョン・ロックはイングランドのリントンに生まれた。オックスフォード大学で医学と哲学を学び、政治家シャフツベリ伯の侍医・秘書となる。主著『人間知性論』でデカルトらの生得観念説を批判し、すべての知識は経験（外的感覚と内的反省）に由来すると主張。「白紙（タブラ・ラサ）」の比喩で有名。第一性質（形、大きさなど客観的性質）と第二性質（色、音など主観的性質）の区別を提唱。政治哲学では『統治二論』で社会契約説、自然権、抵抗権を論じ、自由主義の基礎を築いた。'
+                },
+                {
+                    id: 'hume',
+                    name: 'ヒューム',
+                    title: '懐疑論の哲学者・因果律の批判',
+                    years: '1711 - 1776',
+                    bio: '因果関係は経験から導けない。それは習慣による連想に過ぎない。',
+                    detail: 'デイヴィッド・ヒュームはスコットランドのエディンバラに生まれた。法律家を目指したが哲学に転向。『人間本性論』で経験論を徹底し、ロックを超える懐疑論を展開。すべての観念は印象（知覚）に由来する。因果関係は恒常的な連接（conjunction）の経験から習慣的に推論されるだけで、必然的結合ではない。この因果律批判はカントを「独断の眠りから覚ました」。自我の実体性も否定し、自我は知覚の束に過ぎないとした。道徳哲学では「存在から当為は導けない」（ヒュームの法則）を示し、理性より情念を重視した。'
+                },
+                {
+                    id: 'kant',
+                    name: 'カント',
+                    title: '批判哲学の創始者・コペルニクス的転回',
+                    years: '1724 - 1804',
+                    bio: '認識は対象に従うのではなく、対象が認識に従う。',
+                    detail: 'イマヌエル・カントはプロイセンのケーニヒスベルクに生まれ、生涯その地を離れなかった。規則正しい生活で知られ、住民は彼の散歩で時計を合わせたという。『純粋理性批判』で認識論の革命（コペルニクス的転回）を成し遂げた：認識が対象に従うのではなく、対象が認識の形式（時間・空間の直観形式、カテゴリー）に従う。これにより、ヒュームの懐疑論を克服し、経験論と合理論を総合。現象（認識可能）と物自体（認識不可能）の区別を導入。『実践理性批判』では定言命法による義務論的倫理学を展開。『判断力批判』で美学と目的論を論じ、三批判書で近代哲学を集大成した。'
+                },
+                {
+                    id: 'berkeley',
+                    name: 'バークリー',
+                    title: '観念論の哲学者・存在することは知覚されることである',
+                    years: '1685 - 1753',
+                    bio: 'Esse est percipi（存在することは知覚されることである）。物質は存在しない。',
+                    detail: 'ジョージ・バークリーはアイルランドに生まれ、後にクロイン司教となる。『人知原理論』で主観的観念論を展開。ロックの第一性質・第二性質の区別を批判し、両者とも主観的であるとした。物質的実体は存在せず、存在するのは精神と観念のみ。「存在することは知覚されることである（Esse est percipi）」。では知覚されていないときに物はどうなるのか？神が常に知覚しているから存在し続ける。この観念論は当時は奇妙に見えたが、20世紀の現象学や量子力学の解釈に示唆を与えている。'
+                },
+                {
+                    id: 'pascal',
+                    name: 'パスカル',
+                    title: '数学者・神学者・人間は考える葦',
+                    years: '1623 - 1662',
+                    bio: '人間は考える葦である。パンセ（瞑想録）。パスカルの賭け。',
+                    detail: 'ブレーズ・パスカルはフランスのクレルモン＝フェランに生まれた。数学者・物理学者として確率論、流体力学（パスカルの原理）、計算機の発明などで業績を残す。1654年の神秘体験後、ジャンセニスム（厳格なカトリック）に傾倒。『パンセ（瞑想録）』は死後出版された断章集で、人間の悲惨と偉大さ、理性の限界、信仰の必要性を論じる。「人間は考える葦である」という有名な言葉は、人間の物理的脆弱性と精神的偉大さの対比を示す。「パスカルの賭け」は、神の存在に賭けるのが合理的だという決断理論の先駆的議論。'
+                }
+            ],
+            modern: [
+                {
+                    id: 'hegel',
+                    name: 'ヘーゲル',
+                    title: 'ドイツ観念論の完成者・弁証法',
+                    years: '1770 - 1831',
+                    bio: '弁証法：正・反・合の発展。絶対精神の自己展開としての歴史。',
+                    detail: 'ゲオルク・ヴィルヘルム・フリードリヒ・ヘーゲルはシュトゥットガルトに生まれた。テュービンゲン神学校でシェリング、ヘルダーリンと同室。ベルリン大学教授として絶大な影響力を持つ。『精神現象学』『論理学』『法哲学』で壮大な体系を構築。弁証法：あらゆるものは矛盾を内包し、対立物の統一を通じて発展する（正→反→合）。歴史は絶対精神（理性）の自己実現過程であり、プロイセン国家がその頂点。この思想は左派（マルクス：唯物弁証法）と右派（保守主義）に分裂。現象学、実存主義、批判理論など20世紀哲学に多大な影響。'
+                },
+                {
+                    id: 'kierkegaard',
+                    name: 'キルケゴール',
+                    title: '実存主義の父・主体性は真理である',
+                    years: '1813 - 1855',
+                    bio: '実存は本質に先立つ。主体性こそが真理だ。',
+                    detail: 'セーレン・キルケゴールはコペンハーゲンに生まれた。婚約者レギーネとの破局が思想形成に影響。ヘーゲルの体系哲学を批判し、個別的実存、主体性、決断を強調。『あれかこれか』『不安の概念』『死に至る病』などの著作で、実存の三段階（美的・倫理的・宗教的）、実存的不安、絶望、信仰における飛躍（パラドックス）を論じた。「真理は主体性である」という言葉は、客観的真理よりも、どう生きるかという主体の決断の重要性を示す。ハイデガー、サルトルら20世紀実存主義の源流。'
+                },
+                {
+                    id: 'nietzsche',
+                    name: 'ニーチェ',
+                    title: '神の死・超人思想・力への意志',
+                    years: '1844 - 1900',
+                    bio: '神は死んだ。超人、永劫回帰、力への意志。ニヒリズムの克服。',
+                    detail: 'フリードリヒ・ニーチェはザクセンのレッケンに生まれた。バーゼル大学の若き古典文献学教授となるが、健康を害して辞職。放浪生活の中で執筆。1889年に精神崩壊、1900年に死去。『悲劇の誕生』『ツァラトゥストラはこう語った』『善悪の彼岸』などで、キリスト教道徳（奴隷道徳）を批判し、貴族的道徳（主人道徳）を称揚。「神は死んだ」とニヒリズムの到来を宣言し、その克服として超人、永劫回帰、力への意志を提唱。ルサンチマン、遠近法主義など、現代思想（実存主義、ポストモダン）に決定的影響を与えた。'
+                },
+                {
+                    id: 'heidegger',
+                    name: 'ハイデガー',
+                    title: '存在と時間・現存在の分析',
+                    years: '1889 - 1976',
+                    bio: '存在の意味への問い。現存在は世界-内-存在である。',
+                    detail: 'マルティン・ハイデガーはドイツのメスキルヒに生まれた。フッサールの現象学を学び、フライブルク大学教授となる。主著『存在と時間』（1927年）で「存在の意味への問い」を提起。人間（現存在）は「世界-内-存在」であり、気分、理解、言語を通じて存在を開示する。本来性と非本来性、死への存在、不安、時間性など、実存的分析を展開。ナチス党に入党し学長を務めたことは生涯の汚点となった。後期は「存在の歴史」「技術への問い」「詩と思索」へと思想を転回。サルトル、レヴィナス、デリダ、フーコーなど現代哲学全般に影響。'
+                },
+                {
+                    id: 'sartre',
+                    name: 'サルトル',
+                    title: '実存は本質に先立つ・アンガジュマン',
+                    years: '1905 - 1980',
+                    bio: '実存は本質に先立つ。人間は自由の刑に処されている。',
+                    detail: 'ジャン＝ポール・サルトルはパリに生まれた。高等師範学校でボーヴォワールと出会い、生涯のパートナーとなる。『存在と無』で現象学的存在論を展開：対自存在（意識、無化作用）と即自存在（物、充実）の区別。人間には本質（予め定められた nature）がなく、実存（existence）が先立つ。ゆえに人間は完全に自由であり、「自由の刑に処されている」。この自由は不安を伴い、多くの人は自己欺瞞（悪しき信仰）で逃避する。戦後は実存主義を大衆化し、マルクス主義と統合を試みた。アンガジュマン（社会参加）を唱え、作家として政治活動も行った。'
+                },
+                {
+                    id: 'camus',
+                    name: 'カミュ',
+                    title: '不条理の哲学・シーシュポスの神話',
+                    years: '1913 - 1960',
+                    bio: '世界は不条理である。それでも生き続けなければならない。',
+                    detail: 'アルベール・カミュはフランス領アルジェリアに生まれた。ジャーナリスト、作家として活躍。『異邦人』『ペスト』などの小説と、哲学エッセイ『シーシュポスの神話』『反抗的人間』で不条理の哲学を展開。世界には意味がない（不条理）。それでも人間は生き、意味を求め続ける。この矛盾に誠実に向き合うことが重要。シーシュポス（岩を山頂に運ぶが転がり落ちる、永遠に繰り返す刑罰）は不条理な世界を生きる人間の象徴。自殺ではなく反抗によって不条理に立ち向かう。1957年ノーベル文学賞。1960年交通事故で死去。サルトルと親交後決裂した。'
+                },
+                {
+                    id: 'wittgenstein',
+                    name: 'ウィトゲンシュタイン',
+                    title: '言語哲学の革命・論理哲学論考と哲学探究',
+                    years: '1889 - 1951',
+                    bio: '言語の限界が世界の限界である。語りえぬものについては沈黙せねばならぬ。',
+                    detail: 'ルートヴィヒ・ウィトゲンシュタインはウィーンの富豪の家に生まれた。ケンブリッジ大学でラッセルに学ぶ。第一次大戦に従軍中に『論理哲学論考』を執筆。言語の論理的構造を分析し、「世界は事実の総体である」「語りえぬものについては沈黙せねばならぬ」と結論。哲学の問題は言語の誤用から生じるとして、哲学を終わらせたと考え、小学校教師となる。しかし1930年代に哲学に復帰し、前期の立場を自己批判。『哲学探究』で言語ゲーム、家族的類似、規則に従うこと、私的言語批判など、日常言語の多様性を重視する後期思想を展開。分析哲学に決定的影響を与えた。'
+                },
+                {
+                    id: 'russell',
+                    name: 'ラッセル',
+                    title: '論理学と分析哲学の創始者',
+                    years: '1872 - 1970',
+                    bio: '記述理論。論理的原子論。数学は論理学に還元できる（ logicism）。',
+                    detail: 'バートランド・ラッセルはイギリスの貴族の家に生まれた。ケンブリッジ大学でホワイトヘッドと『プリンキピア・マテマティカ』を著し、数学を論理学に還元する試み（ロジシズム）を展開。記述理論（「現在のフランス王は禿げている」のような文の論理分析）、ラッセルのパラドックス（自分自身を要素としない集合の集合）の発見など、論理学・言語哲学に革命をもたらした。哲学では論理的原子論、中立的一元論を唱えた。反戦運動、核軍縮運動にも積極的に関与し、1950年ノーベル文学賞受賞。98歳まで精力的に活動した。'
+                },
+                {
+                    id: 'foucault',
+                    name: 'フーコー',
+                    title: '権力と知の考古学・系譜学',
+                    years: '1926 - 1984',
+                    bio: '知は権力である。エピステーメー、パノプティコン、生-権力。',
+                    detail: 'ミシェル・フーコーはフランスのポワティエに生まれた。高等師範学校でアルチュセールに学ぶ。『狂気の歴史』『言葉と物』『監獄の誕生』などで、西洋の理性、知、権力の歴史を批判的に分析。各時代の「エピステーメー」（知の基盤）は歴史的に構成され、普遍的真理ではない。近代の人間科学、精神医学、監獄制度は、規律訓練によって身体を従順化する権力メカニズム（パノプティコン）である。後期は「生-権力」（人口管理）や「自己への配慮」（古代ギリシャ・ローマの倫理）を論じた。ポスト構造主義の代表的思想家として、現代思想に多大な影響を与えた。1984年、AIDSで死去。'
+                },
+                {
+                    id: 'derrida',
+                    name: 'デリダ',
+                    title: '脱構築の哲学・差延',
+                    years: '1930 - 2004',
+                    bio: '脱構築（déconstruction）。差延（différance）。テクストの外部はない。',
+                    detail: 'ジャック・デリダはフランス領アルジェリアに生まれた。高等師範学校でフッサール現象学を学ぶ。『グラマトロジーについて』『エクリチュールと差異』で脱構築（デコンストラクション）の方法を提示。西洋形而上学は「音声中心主義」（音声を書記より優越させる）と「現前の形而上学」（現在の特権化）に基づくが、これは「差延（différance）」を抑圧している。差延とは、意味の差異化と遅延の二重の働き。すべてのテクストは他のテクストへの無限の参照であり、「テクストの外部はない」。二項対立（音声/書記、男/女など）を脱構築し、抑圧された項を解放する。文学批判、法哲学、政治理論などに影響を与え、ポストモダン思想の中心人物となった。'
+                },
+                {
+                    id: 'levinas',
+                    name: 'レヴィナス',
+                    title: '他者の哲学・顔の倫理',
+                    years: '1906 - 1995',
+                    bio: '他者の顔は「汝、殺すなかれ」と命じる。倫理は存在論に先立つ。',
+                    detail: 'エマニュエル・レヴィナスはリトアニアのカウナスに生まれたユダヤ人哲学者。フッサール、ハイデガーに学ぶが、ハイデガーのナチス協力に衝撃を受ける。第二次大戦中、捕虜となるが生き延びた。戦後、『全体性と無限』『存在の彼方へ』で他者の哲学を展開。ハイデガーの存在論を批判し、倫理を第一哲学とした。他者の「顔（visage）」は私に無限の責任を要求する。この倫理的関係は存在論に先立つ。ユダヤ的伝統とフランス現象学を融合し、現代倫理学、政治哲学に影響を与えた。'
+                },
+                {
+                    id: 'deleuze',
+                    name: 'ドゥルーズ',
+                    title: '差異と反復・リゾーム',
+                    years: '1925 - 1995',
+                    bio: '差異そのものの哲学。器官なき身体、リゾーム、生成変化。',
+                    detail: 'ジル・ドゥルーズはパリに生まれた。ソルボンヌ大学で哲学を学ぶ。『差異と反復』『意味の論理学』で独創的な形而上学を展開。同一性ではなく差異そのものを原理とする。精神分析家ガタリとの共著『アンチ・オイディプス』『千のプラトー』で、欲望、分裂分析、リゾーム（根茎）の概念を提示。リゾームはツリー構造（階層）に対抗する、中心のないネットワーク。器官なき身体、脱領土化、生成変化など、固定的アイデンティティを拒否する思想。映画論、文学論でも独創的。1995年、病苦から自ら窓から飛び降りて死去。ポスト構造主義の代表的哲学者。'
+                },
+                {
+                    id: 'rawls',
+                    name: 'ロールズ',
+                    title: '正義論・公正としての正義',
+                    years: '1921 - 2002',
+                    bio: '無知のヴェール。格差原理。正義の二原理。',
+                    detail: 'ジョン・ロールズはアメリカのボルティモアに生まれた。ハーバード大学で教鞭をとる。1971年の『正義論』で、功利主義に代わる契約論的正義論を提示し、政治哲学を復興させた。「原初状態」で「無知のヴェール」（自分の社会的地位を知らない）をかぶった人々が選ぶ原理が正義である。第一原理：平等な自由の原理（基本的自由の平等な分配）。第二原理：機会均等と格差原理（不平等は最も不遇な者の利益になる場合のみ正当）。この正義論はリベラリズムの理論的基礎となり、コミュニタリアン（サンデル、マッキンタイア）、リバタリアン（ノージック）との論争を生んだ。'
+                },
+                {
+                    id: 'habermas',
+                    name: 'ハーバーマス',
+                    title: 'コミュニケーション的行為・公共圏',
+                    years: '1929 -',
+                    bio: 'コミュニケーション的理性。討議倫理学。公共圏。',
+                    detail: 'ユルゲン・ハーバーマスはドイツのデュッセルドルフに生まれた。フランクフルト学派の批判理論を継承しつつ、言語論的転回を取り入れる。『コミュニケーション的行為の理論』で、道具的理性に対してコミュニケーション的理性を提唱。討議倫理学：理想的発話状況での合意が規範の妥当性を基礎づける。『公共性の構造転換』で市民的公共圏の概念を提示し、民主主義理論に影響。システム（経済・官僚制）による生活世界の植民地化を批判。ポストモダン批判でも知られ、「近代の擁護者」として啓蒙の理念を現代に継承しようとする。90歳を超えた現在も精力的に執筆活動を続ける現役哲学者。'
+                },
+                {
+                    id: 'frege',
+                    name: 'フレーゲ',
+                    title: '現代論理学の父',
+                    years: '1848 - 1925',
+                    bio: '概念記法。意義と指示対象の区別。論理主義。',
+                    detail: 'ゴットロープ・フレーゲはドイツのヴィスマールに生まれた。イェーナ大学で数学を教える。『概念記法』で述語論理を発明し、アリストテレス以来2000年の論理学を革新した。量化子（∀, ∃）、変項、関数の概念を導入。『算術の基礎』で論理主義（数学を論理学に還元）を試みたが、ラッセルのパラドックスにより挫折。意義（Sinn）と指示対象（Bedeutung）の区別：「明けの明星」と「宵の明星」は同じ対象（金星）を指すが、意義が異なる。この区分は現代言語哲学の基礎。生前は不遇だったが、ラッセル、ウィトゲンシュタインを経由して分析哲学の始祖として認識された。'
+                },
+                {
+                    id: 'quine',
+                    name: 'クワイン',
+                    title: '経験主義の二つのドグマ・翻訳の不確定性',
+                    years: '1908 - 2000',
+                    bio: '分析的/総合的の区別を批判。存在するとは変項の値であることだ。',
+                    detail: 'ウィラード・ヴァン・オーマン・クワインはアメリカのオハイオ州に生まれた。ハーバード大学で教鞭をとる。「経験主義の二つのドグマ」で、分析的/総合的の区別と還元主義を批判し、論理実証主義を解体。知識は全体として経験と対峙する（ホーリズム）。翻訳の不確定性：異なる翻訳マニュアルが同じ行動を説明できる。意味の不確定性。存在論：「存在するとは変項の値であることだ（To be is to be the value of a variable）」。自然化された認識論：認識論は心理学の一部。集合論的唯名論。20世紀後半のアメリカ分析哲学を主導した。'
+                },
+                {
+                    id: 'kripke',
+                    name: 'クリプキ',
+                    title: '様相論理学・固有名の理論',
+                    years: '1940 -',
+                    bio: '可能世界意味論。固有名は固定指示子である。必然的ア・ポステリオリ。',
+                    detail: 'ソール・クリプキはアメリカのニューヨークに生まれた。10代で様相論理学の重要な結果を発表した天才。可能世界意味論を完成させ、様相論理学を確立。『名指しと必然性』で記述説（フレーゲ・ラッセル）を批判。固有名は記述の束ではなく、固定指示子（rigid designator）であり、すべての可能世界で同じ対象を指す。必然的ア・ポステリオリ（水＝H2Oは必然的だが経験的に知られる）と偶然的ア・プリオリを区別。クリプキ・ウィトゲンシュタイン：規則に従うことの懐疑的議論。形而上学、言語哲学、論理学に革命的影響を与え、現代分析哲学の最重要人物の一人。'
+                }
+            ]
+        };
+        
+        // Main App Component
+        const App = () => {
+            const [selectedEra, setSelectedEra] = useState('ancient');
+            const [selectedPhilosopher, setSelectedPhilosopher] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            
+            const currentPhilosophers = PHILOSOPHERS[selectedEra] || [];
+            const filteredPhilosophers = currentPhilosophers.filter(p => 
+                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+            
+            return (
+                <div className="min-h-screen bg-black text-white">
+                    <header className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+                        <div className="container mx-auto px-4 py-4">
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                                    哲学詳細図鑑 - Philosophy Deep Dive
+                                </h1>
+                                <div className="flex gap-4">
+                                    <a href="Illustrated-book.html" className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                                        <ArrowLeft size={16} />
+                                        <span className="hidden sm:inline">簡易版へ</span>
+                                    </a>
+                                    <a href="../index.html" className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                                        <Home size={16} />
+                                        <span className="hidden sm:inline">ホーム</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-64 bg-gray-900 border-b md:border-r border-gray-800 md:min-h-screen">
+                            <div className="p-4">
+                                <h2 className="text-lg font-semibold mb-4">時代区分</h2>
+                                {ERAS.map(era => (
+                                    <button
+                                        key={era.id}
+                                        onClick={() => { setSelectedEra(era.id); setSelectedPhilosopher(null); }}
+                                        className={`w-full text-left p-3 mb-2 rounded-lg transition ${selectedEra === era.id ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'}`}
+                                    >
+                                        <div className="font-semibold">{era.title}</div>
+                                        <div className="text-sm text-gray-400">{era.period}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="w-full md:w-80 bg-gray-900 border-b md:border-r border-gray-800 md:min-h-screen overflow-y-auto">
+                            <div className="p-4">
+                                <div className="relative mb-4">
+                                    <input
+                                        type="text"
+                                        placeholder="哲学者を検索..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full bg-gray-800 text-white px-4 py-2 pl-10 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
+                                    />
+                                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    {filteredPhilosophers.map(phil => (
+                                        <button
+                                            key={phil.id}
+                                            onClick={() => setSelectedPhilosopher(phil)}
+                                            className={`w-full text-left p-3 rounded-lg transition ${selectedPhilosopher?.id === phil.id ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'}`}
+                                        >
+                                            <div className="font-semibold text-sm">{phil.name}</div>
+                                            <div className="text-xs text-gray-400">{phil.title}</div>
+                                            <div className="text-xs text-gray-500 mt-1">{phil.years}</div>
+                                        </button>
+                                    ))}
+                                    {filteredPhilosophers.length === 0 && (
+                                        <div className="text-center text-gray-500 py-8">
+                                            {currentPhilosophers.length === 0 ? '哲学者データを準備中...' : '該当する哲学者が見つかりません'}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex-1 p-6 overflow-y-auto">
+                            {selectedPhilosopher ? (
+                                <div className="max-w-4xl mx-auto">
+                                    <div className="mb-8">
+                                        <h2 className="text-3xl font-bold mb-2">{selectedPhilosopher.name}</h2>
+                                        <p className="text-xl text-blue-400 mb-2">{selectedPhilosopher.title}</p>
+                                        <div className="flex items-center gap-2 text-gray-400 mb-4">
+                                            <Clock size={16} />
+                                            <span>{selectedPhilosopher.years}</span>
+                                        </div>
+                                        
+                                        {selectedPhilosopher.bio && (
+                                            <div className="bg-gray-800 p-4 rounded-lg mb-6">
+                                                <p className="text-gray-300">{selectedPhilosopher.bio}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <CollapsibleSection title="詳細" icon={<BookOpen size={20} />} defaultOpen={true}>
+                                        {selectedPhilosopher.detail || '詳細情報を準備中...'}
+                                    </CollapsibleSection>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center text-gray-400">
+                                        <p className="text-xl mb-2">哲学者を選択してください</p>
+                                        <p className="text-sm">左側のリストから選んで詳細を表示</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
